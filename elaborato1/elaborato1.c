@@ -2,13 +2,14 @@
  * int, unsigned int,
  * short int, unsigned short int,
  * long int, unsigned long int,
+ * long long, unsigned long long,
  * char, unsigned char,
  * double, long double, float */
 #include <stdio.h>
 #include <limits.h>
 #include <float.h>
 
-int main(void){
+int main(void) {
     /* int */
     int int_var = 5;
     printf("TYPE: int NAME: int_var VALUE: %d MIN: %d, MAX: %d BYTE: %lu\n", int_var, INT_MIN, INT_MAX, sizeof(int_var));
@@ -27,9 +28,15 @@ int main(void){
     unsigned long int unsigned_long_int_var = 4794290;
     printf("TYPE: long int NAME: long_int_var VALUE: %lu MIN: %d, MAX: %lu BYTE: %lu\n", unsigned_long_int_var, 0, ULONG_MAX, sizeof(unsigned_long_int_var));
 
+    /* long long */
+    long long long_long_var = 5045009102;
+    printf("TYPE: long long NAME: long_long_var VALUE: %lld MIN: %lld, MAX: %lld BYTE: %lu\n", long_long_var, LLONG_MIN, LLONG_MAX, sizeof(long_long_var));
+    unsigned long long unsigned_long_long_var = 908190120402919;
+    printf("TYPE: unsigned long long NAME: unsigned_long_long_var VALUE: %lld MIN: %d, MAX: %lld BYTE: %lu\n", unsigned_long_long_var, 0, ULLONG_MAX, sizeof(unsigned_long_long_var));
+
     /* char */
     char char_var = 'a';
-    printf("TYPE:  char NAME: char_var VALUE: %d MIN: %d, MAX: %d BYTE: %lu\n", char_var, CHAR_MIN, CHAR_MAX, sizeof(char_var)); // IMPORTANTE CHIEDERE SE VOGLIONO VALORE CARATTERE O NUMERICO
+    printf("TYPE: char NAME: char_var VALUE: %d MIN: %d, MAX: %d BYTE: %lu\n", char_var, CHAR_MIN, CHAR_MAX, sizeof(char_var)); // IMPORTANTE CHIEDERE SE VOGLIONO VALORE CARATTERE O NUMERICO
     unsigned char unsigned_char_var = 'x';
     printf("TYPE: unsigned char NAME: unsigned_char_var VALUE: %d MIN: %d, MAX: %d BYTE: %lu\n", unsigned_char_var, 0, UCHAR_MAX, sizeof(unsigned_char_var));
 
