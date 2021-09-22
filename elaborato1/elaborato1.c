@@ -11,13 +11,13 @@
 
 int main(void) {
     /* int */
-    int int_var = 5;
+    int int_var = 5092;
     printf("TYPE: int NAME: int_var VALUE: %d MIN: %d, MAX: %d BYTE: %lu\n", int_var, INT_MIN, INT_MAX, sizeof(int_var));
-    unsigned int unsigned_int_var = 4005;
+    unsigned int unsigned_int_var = 4078805;
     printf("TYPE: unsigned int NAME: unsigned_int_var VALUE: %u MIN: %u, MAX: %u BYTE: %lu\n", unsigned_int_var, 0, INT_MAX, sizeof(int_var));
 
     /* short int */
-    short int short_int_var = 483;
+    short int short_int_var = 48;
     printf("TYPE: short int NAME: short_int_var VALUE: %d MIN: %d, MAX: %d BYTE: %lu\n", short_int_var, SHRT_MIN, SHRT_MAX, sizeof(short_int_var));
     unsigned short int unsigned_short_int_var = 8040;
     printf("TYPE: unsigned int NAME: unsigned_short_int_var VALUE: %hu MIN: %d, MAX: %d BYTE: %lu\n", unsigned_short_int_var, 0, USHRT_MAX, sizeof(unsigned_short_int_var));
@@ -42,7 +42,7 @@ int main(void) {
 
     /* double */
     double double_var = 3408.8430;
-    printf("TYPE: double  NAME: double_var VALUE: %f MIN: %f, MAX: %f BYTE: %lu\n", double_var, DBL_MIN, DBL_MAX, sizeof(double_var));
+    printf("TYPE: double NAME: double_var VALUE: %f MIN: %f, MAX: %f BYTE: %lu\n", double_var, DBL_MIN, DBL_MAX, sizeof(double_var));
     long double long_double_var = 759494.473;
     printf("TYPE: long double NAME: long_double_var VALUE: %Lf MIN: %Lf, MAX: %Lf BYTE: %lu\n", long_double_var, LDBL_MIN, LDBL_MAX, sizeof(long_double_var));
 
