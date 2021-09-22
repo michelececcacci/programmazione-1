@@ -9,7 +9,7 @@
 #include <limits.h>
 #include <float.h>
 
-int main(void) {
+int main() {
     /* int */
     int int_var = 5092;
     printf("TYPE: int NAME: int_var VALUE: %d MIN: %d, MAX: %d BYTE: %lu\n", int_var, INT_MIN, INT_MAX, sizeof(int_var));
@@ -36,7 +36,7 @@ int main(void) {
 
     /* char */
     char char_var = 'a';
-    printf("TYPE: char NAME: char_var VALUE: %d MIN: %d, MAX: %d BYTE: %lu\n", char_var, CHAR_MIN, CHAR_MAX, sizeof(char_var)); // IMPORTANTE CHIEDERE SE VOGLIONO VALORE CARATTERE O NUMERICO
+    printf("TYPE: char NAME: char_var VALUE: %d MIN: %d, MAX: %d BYTE: %lu\n", char_var, CHAR_MIN, CHAR_MAX, sizeof(char_var));
     unsigned char unsigned_char_var = 'x';
     printf("TYPE: unsigned char NAME: unsigned_char_var VALUE: %d MIN: %d, MAX: %d BYTE: %lu\n", unsigned_char_var, 0, UCHAR_MAX, sizeof(unsigned_char_var));
 
