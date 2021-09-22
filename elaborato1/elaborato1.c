@@ -24,15 +24,15 @@ int main() {
 
     /* long int */
     long int long_int_var = 50000;
-    printf("TYPE: long int NAME: long_int_var VALUE: %ld MIN: %ld, MAX: %ld BYTE: %lu\n", long_int_var, LONG_MIN, LONG_MIN, sizeof(int_var));
+    printf("TYPE: long int NAME: long_int_var VALUE: %ld MIN: %ld, MAX: %ld BYTE: %lu\n", long_int_var, LONG_MIN, LONG_MAX, sizeof(int_var));
     unsigned long int unsigned_long_int_var = 4794290;
-    printf("TYPE: long int NAME: long_int_var VALUE: %lu MIN: %d, MAX: %lu BYTE: %lu\n", unsigned_long_int_var, 0, ULONG_MAX, sizeof(unsigned_long_int_var));
+    printf("TYPE: unsigned long int NAME: long_int_var VALUE: %lu MIN: %d, MAX: %lu BYTE: %lu\n", unsigned_long_int_var, 0, ULONG_MAX, sizeof(unsigned_long_int_var));
 
     /* long long */
     long long long_long_var = 5045009102;
     printf("TYPE: long long NAME: long_long_var VALUE: %lld MIN: %lld, MAX: %lld BYTE: %lu\n", long_long_var, LLONG_MIN, LLONG_MAX, sizeof(long_long_var));
     unsigned long long unsigned_long_long_var = 908190120402919;
-    printf("TYPE: unsigned long long NAME: unsigned_long_long_var VALUE: %lld MIN: %d, MAX: %lld BYTE: %lu\n", unsigned_long_long_var, 0, ULLONG_MAX, sizeof(unsigned_long_long_var));
+    printf("TYPE: unsigned long long NAME: unsigned_long_long_var VALUE: %llu MIN: %d, MAX: %llu BYTE: %lu\n", unsigned_long_long_var, 0, ULLONG_MAX, sizeof(unsigned_long_long_var));
 
     /* char */
     char char_var = 'a';
