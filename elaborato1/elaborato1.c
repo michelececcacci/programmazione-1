@@ -32,15 +32,18 @@ int main() {
     unsigned char unsigned_char_var = 'x';
     printf("TYPE: %-25s NAME: %-25s VALUE: %-20u MIN: %-20u MAX: %-20u BYTE: %-20lu\n", "unsigned char", "unsigned_char_var", unsigned_char_var, 0, UCHAR_MAX, sizeof(unsigned_char_var));
 
+    /* dal momento che i float sono simmetrici, e MIN mostra solo il minimo numero che ha forma normalizzata, per vedere il minimo effettivo si puo usare -MAX/*
     /* double */
     double double_var = 3408.8430;
-    printf("TYPE: %-25s NAME: %-25s VALUE: %-20jf MIN: %-20lg MAX: %-20lg BYTE: %-20lu\n", "double", "double_var", double_var, DBL_MIN, DBL_MAX, sizeof(double_var));
+    printf("TYPE: %-25s NAME: %-25s VALUE: %-20lf MIN: %-20lg MAX: %-20lg BYTE: %-20lu\n", "double", "double_var", double_var, -DBL_MAX, DBL_MAX, sizeof(double_var));
     long double long_double_var = 759494.473;
-    printf("TYPE: %-25s NAME: %-25s VALUE: %-20Lg MIN: %-20Lg MAX: %-20Lg BYTE: %-20lu\n", "long double", "long double", long_double_var, LDBL_MIN, LDBL_MAX, sizeof(long_double_var));
+    printf("TYPE: %-25s NAME: %-25s VALUE: %-20Lg MIN: %-20Lg MAX: %-20Lg BYTE: %-20lu\n", "long double", "long double", long_double_var, -LDBL_MAX, LDBL_MAX, sizeof(long_double_var)); 
 
     /* float */
     float float_var = 5.394F;
-    printf("TYPE: %-25s NAME: %-25s VALUE: %-20g MIN: %-20g MAX: %-20g BYTE: %-20lu\n", "float", "float_var", float_var, FLT_MIN, FLT_MAX, sizeof(float_var));
+    printf("TYPE: %-25s NAME: %-25s VALUE: %-20g MIN: %-20g MAX: %-20g BYTE: %-20lu\n", "float", "float_var", float_var, -FLT_MAX, FLT_MAX, sizeof(float_var));
 
     return 0;
 }
+
+
