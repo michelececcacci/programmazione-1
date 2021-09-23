@@ -1,7 +1,6 @@
 /* Tipi usati:
  * int, unsigned int,
  * short int, unsigned short int, * long int, unsigned long int,
- * long long, unsigned long long,
  * char, unsigned char,
  * double, long double, float */
 #include <stdio.h>
@@ -25,7 +24,7 @@ int main() {
     long int long_int_var = 534008;
     printf("TYPE: %-25s NAME: %-25s VALUE: %-20ld MIN: %-20ld MAX: %-20ld BYTE: %-20ld\n", "long int", "long_int_var", long_int_var, LONG_MIN, LONG_MAX, sizeof(long_int_var));
     unsigned long int unsigned_long_int_var = 4290;
-    printf("TYPE: %-25s NAME: %-25s VALUE: %-20lu MIN: %-20lu MAX: %-20lu BYTE: %-20ld\n", "unsigned long int", "unsigned_long_int_var", unsigned_long_int_var, 0, ULONG_MAX, sizeof(unsigned_long_int_var));
+    printf("TYPE: %-25s NAME: %-25s VALUE: %-20lu MIN: %-20d MAX: %-20lu BYTE: %-20ld\n", "unsigned long int", "unsigned_long_int_var", unsigned_long_int_var, 0, ULONG_MAX, sizeof(unsigned_long_int_var));
 
     /* char */
     char char_var = 'a';
@@ -35,13 +34,13 @@ int main() {
 
     /* double */
     double double_var = 3408.8430;
-    printf("TYPE: %-25s NAME: %-25s VALUE: %-20lf MIN: %-20lg MAX: %-20lg BYTE: %-20lu\n", "double", "double_var", double_var, DBL_MIN, DBL_MAX, sizeof(double_var));
+    printf("TYPE: %-25s NAME: %-25s VALUE: %-20jf MIN: %-20lg MAX: %-20lg BYTE: %-20lu\n", "double", "double_var", double_var, DBL_MIN, DBL_MAX, sizeof(double_var));
     long double long_double_var = 759494.473;
-    printf("TYPE: %-25s NAME: %-25s VALUE: %-20d MIN: %-20.3Lg MAX: %-20lg BYTE: %-20lu\n", "long double", "long_double_var", long_double_var, LDBL_MIN, LDBL_MAX, sizeof(long_double_var));
+    printf("TYPE: %-25s NAME: %-25s VALUE: %-20Lg MIN: %-20Lg MAX: %-20Lg BYTE: %-20lu\n", "long double", "long double", long_double_var, LDBL_MIN, LDBL_MAX, sizeof(long_double_var));
 
     /* float */
     float float_var = 5.394F;
-    printf("TYPE: %-25s NAME: %-25s VALUE: %-20f MIN: %-20lg MAX: %-20lg BYTE: %-20lu\n", "float", "float_var", float_var, FLT_MIN, FLT_MAX, sizeof(float_var));
+    printf("TYPE: %-25s NAME: %-25s VALUE: %-20g MIN: %-20g MAX: %-20g BYTE: %-20lu\n", "float", "float_var", float_var, FLT_MIN, FLT_MAX, sizeof(float_var));
 
     return 0;
 }
