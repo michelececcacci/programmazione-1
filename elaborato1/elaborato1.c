@@ -32,7 +32,7 @@ int main() {
     unsigned char unsigned_char_var = 'x';
     printf("TYPE: %-25s NAME: %-25s VALUE: %-20u MIN: %-20u MAX: %-20u BYTE: %-20lu\n", "unsigned char", "unsigned_char_var", unsigned_char_var, 0, UCHAR_MAX, sizeof(unsigned_char_var));
     signed char signed_char_var = 's';
-    printf("TYPE: %-25s NAME: %-25s VALUE: %-20u MIN: %-20u MAX: %-20u BYTE: %-20lu\n", "signed char", "signed_char_var", signed_char_var, SCHAR_MIN, SCHAR_MAX, sizeof(signed_char_var));
+    printf("TYPE: %-25s NAME: %-25s VALUE: %-20u MIN: %-20d MAX: %-20u BYTE: %-20lu\n", "signed char", "signed_char_var", signed_char_var, SCHAR_MIN, SCHAR_MAX, sizeof(signed_char_var));
 
     double double_var = 3408.8430;
     printf("TYPE: %-25s NAME: %-25s VALUE: %-20lf MIN: %-20lg MAX: %-20lg BYTE: %-20lu\n", "double", "double_var", double_var, -DBL_MIN, DBL_MAX, sizeof(double_var));
