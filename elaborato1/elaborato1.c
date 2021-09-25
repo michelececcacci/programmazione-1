@@ -41,7 +41,7 @@ int main() {
 
     /* float */
     float float_var = 5.394F;
-    printf("TYPE: %-25s NAME: %-25s VALUE: %-20g MIN: %-20g MAX: %-20g BYTE: %-20lu\n", "float", "float_var", float_var, -FLT_MAX, FLT_MAX, sizeof(float_var));
+    printf("TYPE: %-25s NAME: %-25s VALUE: %-20g MIN: %-20g MAX: %-20g BYTE: %-20lu\n", "float", "float_var", float_var, -FLT_MIN, FLT_MAX, sizeof(float_var));
 
     return 0;
 }
