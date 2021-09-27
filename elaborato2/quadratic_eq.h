@@ -13,5 +13,5 @@
 #define ROOT1(a, b, c) ROOT(a, b, c, 1)
 #define ROOT2(a, b, c) ROOT(a, b, c, -1)
 #define EXTREME_POINT(a, b, c) -b / (2 * a)
-/* Se anche solo un punto dell' equazione  e maggiore di una radice, allora il punto e necessariamente un minimo, se no e un massimo. */
-#define MAXIMUM_POINT(a, b, c)  f(EXTREME_POINT(a, b, c), a, b, c)>= f(ROOT1(a, b, c), a, b, c) && f(EXTREME_POINT(a, b, c), a, b, c)>= f(ROOT2(a, b, c), a, b, c) 
+/* se un punto vicino all' estremo ha y > del valore dell' estremo allora  il punto è un minimo*/
+#define MAXIMUM_POINT(a, b, c)  f(EXTREME_POINT(a, b, c), a, b, c) > f(EXTREME_POINT(a, b, c) + 0.1, a, b, c) 
