@@ -12,8 +12,8 @@
 
 /* Macro della consegna */
 #define NUM_OF_ROOTS(a, b, c) ({double delta = DELTA(a, b, c); delta < 0 ? 0 : delta > 0 ? 2 : 1;})
-#define ROOT1(a, b, c) ROOT(a, b, c, 1)
-#define ROOT2(a, b, c) ROOT(a, b, c, -1)
+#define ROOT1(a, b, c) ROOT(a, b, c, -1)
+#define ROOT2(a, b, c) ROOT(a, b, c, 1)
 #define EXTREME_POINT(a, b, c) -(b) / (2 * (a))
 /* Se un punto vicino all'estremo ha y maggiore del valore dell'estremo, allora il punto è un minimo */
 #define MAXIMUM_POINT(a, b, c)  F(EXTREME_POINT(a, b, c), a, b, c) > F(EXTREME_POINT(a, b, c) + 0.1, a, b, c)
