@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "quadratic_eq.h"
+#include <math.h>
 
 int main() {
     printf("%d ", NUM_OF_ROOTS(0.5,-2.0,1.5)); /* 2 */
