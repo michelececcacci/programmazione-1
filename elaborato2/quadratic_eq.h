@@ -6,7 +6,7 @@
  * da a, b, c e "sign", che può essere 1 per il risultato maggiore o -1 per quello minore. */
 #define ROOT(a, b, c, sign) ((-(b)) + sign * sqrt(DELTA(a, b, c))) / (2 * (a))
 /* La macro F(x) calcola il valore della y della funzione ax^2 + bx + c in un punto x*/
-#define F(x, a, b, c) (pow(x, 2) * (a) + (x) * (b) + (c))
+#define F(x, a, b, c) ((x) * (x) * (a) + (x) * (b) + (c))
 
 /* Macro della consegna */
 #define NUM_OF_ROOTS(a, b, c) (DELTA(a, b, c) < 0 ? 0 : DELTA(a, b, c) > 0 ? 2 : 1)
