@@ -14,4 +14,4 @@
 #define ROOT2(a, b, c) ((a) > 0 ? ROOT(a, b, c, -1) : ROOT(a, b, c, 1))
 #define EXTREME_POINT(a, b, c) (-(b) / (2 * (a)))
 /* Se un punto vicino all'estremo ha y maggiore del valore dell'estremo, allora il punto è un minimo */
-#define MAXIMUM_POINT(a, b, c)  F(EXTREME_POINT(a, b, c), a, b, c) > F(EXTREME_POINT(a, b, c) + 0.1, a, b, c)
+#define MAXIMUM_POINT(a, b, c)  (2 * (a)) > 0 ? 0: 1
