@@ -1,34 +1,37 @@
 #include <stdio.h>
 #include <math.h>
-
 int main() {
-	unsigned int input;
+	unsigned int x;
     printf("Inserire un numero: ");
-    scanf("%u", &input);
+    scanf("%u", &x);
 
-    /* Punto 3 */
-    int zeros = 0;
-    unsigned int n = input;
-    while (n > 0) {
-        if(n % 10 == 0) zeros++;
-        n /= 10;
-    }
-
+    unsigned int n = x;
     /* Punto 1 */
     unsigned int reversed = 0;
-    for (n = input; n > 0; n /= 10) {
+    for (n = x; n > 0; n /= 10) {
         reversed = reversed * 10 + (n % 10);
 	}
 
     /* Punto 2 */
     int size = 0;
-    n = input;
+    n = x;
     do {
         size++;
         n /= 10;
     } while (n > 0);
 
-    int compl = (int) (pow(10, size) - input);
+    /* Punto 3 */
+    int zeros = 0;
+    n = x;
+    while (n > 0) {
+        if((n % 10)== 0) {
+            zeros++;
+        }
+        n /= 10;
+    }
+
+
+    int compl = (int) (pow(10, size) - x);
 
     /* Output */
     printf("%d", reversed);
