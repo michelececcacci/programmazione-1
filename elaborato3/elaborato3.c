@@ -13,29 +13,35 @@ int main() {
 	}
 
     /* Punto 2 */
-    int res2 = 0; /* res2 = size */
+    int size= 0; /* res2 = size */
     n = x;
     do {
-        res2++;
+        size++;
         n /= 10;
     } while (n > 0);
 
     /* Punto 3 */
     int res3 = 0; /* res3 = zeros */
     n = x;
-    while (n > 0) {
-        if((n % 10)== 0) {
-            res3++;
+    if (x > 0)
+    {
+        while (n > 0) 
+        {
+            if((n % 10)== 0) 
+            {
+                res3++;
+            }
+            n /= 10;
         }
-        n /= 10;
     }
+    else 
+        res3 = 1;
 
-
-    int compl = (int) (pow(10, res2) - x);
+    int res2 = (int) (pow(10, size) - x);
 
     /* Output */
     printf("%d", res1);
-    printf(" %d", compl);
+    printf(" %d", res2);
     printf(" %d", res3);
 
 	printf("\n");
