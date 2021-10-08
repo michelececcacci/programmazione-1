@@ -1,3 +1,4 @@
+#include <math.h>
 /* Le variabili nelle macro sono state "protette" tra parentesi. */
 
 /* La macro DELTA ottiene il delta (b^2 - 4ac) da a, b e c */

@@ -6,7 +6,7 @@
 #include <math.h>
 
 
-int main() {
+int main ( int argc , char * argv []) {
 	unsigned int x;
 	unsigned int res1=0, res2=0, res3=0;
 
