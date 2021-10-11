@@ -1,15 +1,22 @@
 #include <stdio.h>
 #include "prime.h"
-#include <math.h>
+
+int main() {
+    printf("%d", is_prime(4));
+    printf("%d", is_prime(5));
+    printf("%d", is_prime(7));
+    return 0;
+}
 
 /* Ritorna 1 se n e' primo, 0 altrimenti. */
-unsigned short int is_prime(unsigned short int n){
-	int i = 0;
-	for (i = 1; i < n/2; i++){
-		if (n % i == 0)
-			return 1;
-	}
-	return 0;
+unsigned short int is_prime(unsigned short int n) {
+    int i = 0;
+    for (i = 2; i <= n / 2; i++) {
+        if (n % i == 0) {
+            return 0;
+        }
+    }
+    return 1;
 }
 
 /*
@@ -19,13 +26,13 @@ unsigned short int is_prime(unsigned short int n){
  * con un unsigned short int, ritorna 0.
  */
 // TODO NON CAPISCO PERCHE MA CODEBOARD PRENDE 0 COME INPUT
-unsigned short int nth_prime(unsigned short int n){
-	int i = 0;
-	while (i < n) {
-		if (is_prime(i))
-			i++;
-	}
-	return n;
+unsigned short int nth_prime(unsigned short int n) {
+    int i = 0;
+    while (i < n) {
+        if (is_prime(i))
+            i++;
+    }
+    return i;
 }
 
 /* Ritorna la successione di numeri primi.
@@ -40,8 +47,8 @@ unsigned short int nth_prime(unsigned short int n){
  * rappresentato con un unsigned short int, la funzione
  * ritorna 0 e la seccessione viene resettata.
  */
-unsigned short int succ_prime(int reset){}
+unsigned short int succ_prime(int reset) {}
 
 /* Ritorna 1 se m e n sono coprimi, 0 altrimenti. */
 unsigned short int co_prime(unsigned short int m,
-                            unsigned short int n){}
+                            unsigned short int n) {}
