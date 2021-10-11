@@ -14,6 +14,11 @@ int main() {
 
 /* Ritorna 1 se n e' primo, 0 altrimenti. */
 unsigned short int is_prime(unsigned short int n) {
+    /*
+     * Vengono iterati i numeri da 2 a metà del numero stesso,
+     * se il resto della divisione tra il numero dato e tutti i numeri iterati
+     * è diverso da zero (= non è un multiplo), il numero è primo.
+     */
     unsigned short int i = 0;
     for (i = 2; i <= n / 2; i++) {
         if (n % i == 0) {
@@ -30,9 +35,21 @@ unsigned short int is_prime(unsigned short int n) {
  * con un unsigned short int, ritorna 0.
  */
 unsigned short int nth_prime(unsigned short int n) {
+    /*
+     * Controllo del valore di n per evitare overflow.
+     */
     if(n >= USHRT_MAX) return 0;
 
+    /*
+     * primes_found determina la quantità di numeri primi incontrati fin'ora.
+     */
     unsigned short int primes_found = 0;
+
+    /*
+     * Viene eseguito un loop, a partire da 2, la cui unica condizione di uscita
+     * è se la quantità di numeri primi incontrati combacia con n (> usato per sicurezza).
+     * La quantità aumenta se il numero iterato è primo.
+     */
     unsigned short int i;
     for (i = 2;; i++) {
         if(is_prime(i)) {
@@ -55,14 +72,28 @@ unsigned short int nth_prime(unsigned short int n) {
  * ritorna 0 e la seccessione viene resettata.
  */
 unsigned short int succ_prime(int reset) {
+    /*
+     * i determina il valore della sequenza corrente.
+     */
     static unsigned short int i = -1;
+
+    /*
+     * Se la sequenza viene resettata, i torna a 0.
+     */
     if(reset) {
         i = 0;
         return 2;
     }
     i++;
 
+    /*
+     * Viene calcolato il numero primo corrispondente nella sequenza.
+     */
     unsigned short int prime = nth_prime(i);
+
+    /*
+     * Viene effettuato un reset se il numero primo è 0, ovvero se ha superato il limite di unsigned short int.
+     */
     if(prime == 0) i = 0;
     return prime;
 }
