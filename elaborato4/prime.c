@@ -33,11 +33,10 @@ unsigned short int nth_prime(unsigned short int n) {
     int i;
     for (i = 2;; i++) {
         if(is_prime(i)) {
-            if(primes_found >= n) break;
+            if(primes_found >= n) return i;
             primes_found++;
         }
     }
-    return i;
 }
 
 /* Ritorna la successione di numeri primi.
