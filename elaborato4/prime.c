@@ -2,9 +2,12 @@
 #include "prime.h"
 
 int main() {
-    printf("%d", is_prime(4));
-    printf("%d", is_prime(5));
-    printf("%d", is_prime(7));
+    printf("%d\n", nth_prime(0));
+    printf("%d\n", nth_prime(1));
+    printf("%d\n", nth_prime(2));
+    printf("%d\n", nth_prime(3));
+    printf("%d\n", nth_prime(4));
+    printf("%d\n", nth_prime(5));
     return 0;
 }
 
@@ -25,12 +28,14 @@ unsigned short int is_prime(unsigned short int n) {
  * Se il numero e' troppo grande per essere rappresentato
  * con un unsigned short int, ritorna 0.
  */
-// TODO NON CAPISCO PERCHE MA CODEBOARD PRENDE 0 COME INPUT
 unsigned short int nth_prime(unsigned short int n) {
-    int i = 0;
-    while (i < n) {
-        if (is_prime(i))
-            i++;
+    int primes_found = 0;
+    int i;
+    for (i = 2;; i++) {
+        if(is_prime(i)) {
+            if(primes_found >= n) break;
+            primes_found++;
+        }
     }
     return i;
 }
