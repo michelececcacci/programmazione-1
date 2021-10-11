@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <limits.h>
 #include "prime.h"
 
 int main() {
@@ -13,7 +14,7 @@ int main() {
 
 /* Ritorna 1 se n e' primo, 0 altrimenti. */
 unsigned short int is_prime(unsigned short int n) {
-    int i = 0;
+    unsigned short int i = 0;
     for (i = 2; i <= n / 2; i++) {
         if (n % i == 0) {
             return 0;
@@ -29,8 +30,10 @@ unsigned short int is_prime(unsigned short int n) {
  * con un unsigned short int, ritorna 0.
  */
 unsigned short int nth_prime(unsigned short int n) {
-    int primes_found = 0;
-    int i;
+    if(n >= USHRT_MAX) return 0;
+
+    unsigned short int primes_found = 0;
+    unsigned short int i;
     for (i = 2;; i++) {
         if(is_prime(i)) {
             if(primes_found >= n) return i;
@@ -52,13 +55,16 @@ unsigned short int nth_prime(unsigned short int n) {
  * ritorna 0 e la seccessione viene resettata.
  */
 unsigned short int succ_prime(int reset) {
-    static int i = -1;
+    static unsigned short int i = -1;
     if(reset) {
         i = 0;
         return 2;
     }
     i++;
-    return nth_prime(i);
+
+    unsigned short int prime = nth_prime(i);
+    if(prime == 0) i = 0;
+    return prime;
 }
 
 /* Ritorna 1 se m e n sono coprimi, 0 altrimenti. */
