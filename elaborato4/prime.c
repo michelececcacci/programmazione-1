@@ -2,12 +2,12 @@
 #include "prime.h"
 
 int main() {
-    printf("%d\n", nth_prime(0));
-    printf("%d\n", nth_prime(1));
-    printf("%d\n", nth_prime(2));
-    printf("%d\n", nth_prime(3));
-    printf("%d\n", nth_prime(4));
-    printf("%d\n", nth_prime(5));
+    printf("%d\n", succ_prime(0));
+    printf("%d\n", succ_prime(0));
+    printf("%d\n", succ_prime(0));
+    printf("%d\n", succ_prime(1));
+    printf("%d\n", succ_prime(0));
+    printf("%d\n", succ_prime(0));
     return 0;
 }
 
@@ -52,7 +52,15 @@ unsigned short int nth_prime(unsigned short int n) {
  * rappresentato con un unsigned short int, la funzione
  * ritorna 0 e la seccessione viene resettata.
  */
-unsigned short int succ_prime(int reset) {}
+unsigned short int succ_prime(int reset) {
+    static int i = -1;
+    if(reset) {
+        i = 0;
+        return 2;
+    }
+    i++;
+    return nth_prime(i);
+}
 
 /* Ritorna 1 se m e n sono coprimi, 0 altrimenti. */
 unsigned short int co_prime(unsigned short int m,
