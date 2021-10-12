@@ -30,7 +30,7 @@ unsigned short int nth_prime(unsigned short int n) {
     /*
      * Controllo del valore di n per evitare overflow.
      */
-    if(n >= USHRT_MAX) return 0;
+    if (n >= USHRT_MAX) return 0;
 
     /*
      * primes_found determina la quantità di numeri primi incontrati fin'ora.
@@ -44,8 +44,8 @@ unsigned short int nth_prime(unsigned short int n) {
      */
     unsigned short int i;
     for (i = 2;; i++) {
-        if(is_prime(i)) {
-            if(primes_found >= n) return i;
+        if (is_prime(i)) {
+            if (primes_found >= n) return i;
             primes_found++;
         }
     }
@@ -72,7 +72,7 @@ unsigned short int succ_prime(int reset) {
     /*
      * Se la sequenza viene resettata, i torna a 0.
      */
-    if(reset) {
+    if (reset) {
         i = 0;
         return 2;
     }
@@ -86,22 +86,19 @@ unsigned short int succ_prime(int reset) {
     /*
      * Viene effettuato un reset se il numero primo è 0, ovvero se ha superato il limite di unsigned short int.
      */
-    if(prime == 0) i = 0;
+    if (prime == 0) i = 0;
     return prime;
 }
 
 /* Ritorna 1 se m e n sono coprimi, 0 altrimenti. */
 unsigned short int co_prime(unsigned short int m, unsigned short int n) {
-    return gcd(m, n) == 1;
-}
-
-
-static unsigned short int gcd(unsigned short int m, unsigned short int n){
-    /* Usa l' algoritmo di euclide per computare l' mcd. Statica per limitare il suo uso all' interno di prime.c*/
+    /*
+     * Usa l' algoritmo di Euclide per computare l'mcd.
+     */
     int r;
-    while ((r = m%n) > 0){
-    m = n;
-    n = r;
+    while ((r = m % n) > 0) {
+        m = n;
+        n = r;
     }
     return n;
 }
