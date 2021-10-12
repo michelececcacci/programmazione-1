@@ -2,8 +2,6 @@
 #include <limits.h>
 #include "prime.h"
 
-static unsigned short int gcd(unsigned short int m, unsigned short int n);
-
 /* Ritorna 1 se n e' primo, 0 altrimenti. */
 unsigned short int is_prime(unsigned short int n) {
     /*
@@ -92,18 +90,13 @@ unsigned short int succ_prime(int reset) {
 
 /* Ritorna 1 se m e n sono coprimi, 0 altrimenti. */
 unsigned short int co_prime(unsigned short int m, unsigned short int n) {
-    return gcd(m, n) == 1;
-}
-
-
-static unsigned short int gcd(unsigned short int m, unsigned short int n) {
     /*
-     * Usa l' algoritmo di Euclide per computare l'mcd. Statica per limitare il suo uso all' interno di prime.c
+     * Usa l' algoritmo di Euclide per computare l'mcd.
      */
     int r;
     while ((r = m % n) > 0) {
         m = n;
         n = r;
     }
-    return n;
+    return n == 1;
 }
