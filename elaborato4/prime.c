@@ -2,8 +2,6 @@
 #include <limits.h>
 #include "prime.h"
 
-static unsigned short int gcd(unsigned short int m, unsigned short int n);
-
 /* Ritorna 1 se n e' primo, 0 altrimenti. */
 unsigned short int is_prime(unsigned short int n) {
     /*
