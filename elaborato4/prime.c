@@ -1,9 +1,12 @@
-#include <stdio.h>
 #include <limits.h>
 #include "prime.h"
 
 /* Ritorna 1 se n e' primo, 0 altrimenti. */
 unsigned short int is_prime(unsigned short int n) {
+    /*
+     * Un numero primo è maggiore di 1.
+     */
+    if(n < 2) return 0;
     /*
      * Vengono iterati i numeri da 2 a metà del numero stesso,
      * se il resto della divisione tra il numero dato e tutti i numeri iterati
