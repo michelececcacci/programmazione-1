@@ -1,7 +1,9 @@
 #include <limits.h>
+#include <math.h>
 #include "prime.h"
 
 /* Ritorna 1 se n e' primo, 0 altrimenti. */
+static unsigned short int next_prime(unsigned short int n);
 unsigned short int is_prime(unsigned short int n) {
     /*
      * Un numero primo è maggiore di 1.
@@ -13,7 +15,7 @@ unsigned short int is_prime(unsigned short int n) {
      * è diverso da zero (= non è un multiplo), il numero è primo.
      */
     unsigned short int i = 0;
-    for (i = 2; i <= n / 2; i++) {
+    for (i = 2; i <= sqrt(n); ++i) {
         if (n % i == 0) {
             return 0;
         }
@@ -43,6 +45,7 @@ unsigned short int nth_prime(unsigned short int n) {
      * è se la quantità di numeri primi incontrati combacia con n (> usato per sicurezza).
      * La quantità aumenta se il numero iterato è primo.
      */
+    // todo doesn't handle overflow well (values >= 6542)
     unsigned short int i;
     for (i = 2;; i++) {
         if (is_prime(i)) {
@@ -65,34 +68,20 @@ unsigned short int nth_prime(unsigned short int n) {
  * ritorna 0 e la seccessione viene resettata.
  */
 unsigned short int succ_prime(int reset) {
-    /*
-     * i determina il valore della sequenza corrente.
-     */
-    static unsigned short int i = -1;
-
-    /*
-     * Se la sequenza viene resettata, i torna a 0.
-     */
+    static unsigned short int prime = 1; 
+    // todo find a way to hadnle overflow
     if (reset) {
-        i = 0;
-        return 2;
+        prime = 2;
+        return prime;
     }
-    i++;
-
-    /*
-     * Viene calcolato il numero primo corrispondente nella sequenza.
-     */
-    unsigned short int prime = nth_prime(i);
-
-    /*
-     * Viene effettuato un reset se il numero primo è 0, ovvero se ha superato il limite di unsigned short int.
-     */
-    if (prime == 0) i = 0;
+    prime = next_prime(prime);
+    if (prime == 0) prime = 0;
     return prime;
 }
 
 /* Ritorna 1 se m e n sono coprimi, 0 altrimenti. */
 unsigned short int co_prime(unsigned short int m, unsigned short int n) {
+    if (n >= USHRT_MAX) return 0;
     /*
      * Usa l' algoritmo di Euclide per computare l'mcd.
      */
@@ -102,4 +91,13 @@ unsigned short int co_prime(unsigned short int m, unsigned short int n) {
         n = r;
     }
     return n == 1;
+}
+
+/*Ritorna il primo successivo a n*/
+static unsigned short int next_prime(unsigned short int n){
+    do {
+        ++n; 
+    }
+    while(!is_prime(n));
+    return n;
 }
