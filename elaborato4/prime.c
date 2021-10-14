@@ -3,7 +3,7 @@
 #include "prime.h"
 
 /* Ritorna 1 se n e' primo, 0 altrimenti. */
-static unsigned short int next_prime(unsigned short int n);
+static unsigned int next_prime(unsigned int n);
 unsigned short int is_prime(unsigned short int n) {
     /*
      * Un numero primo è maggiore di 1.
@@ -75,8 +75,8 @@ unsigned short int succ_prime(int reset) {
         return prime;
     }
     prime = next_prime(prime);
-    if (prime >= USHRT_MAX ) {
-        prime = 2;
+    if (prime > USHRT_MAX ) {
+        prime = 1;
         return 0;
     }
     if (prime == 0) prime = 0;
@@ -98,7 +98,7 @@ unsigned short int co_prime(unsigned short int m, unsigned short int n) {
 }
 
 /*Ritorna il primo successivo a n*/
-static unsigned short int next_prime(unsigned short int n){
+static unsigned int next_prime(unsigned int n){
     do {
         ++n; 
     }
