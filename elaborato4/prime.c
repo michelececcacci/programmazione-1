@@ -33,8 +33,6 @@ unsigned short int nth_prime(unsigned short int n) {
     /*
      * Controllo del valore di n per evitare overflow.
      */
-    if (n >= USHRT_MAX) return 0;
-
     /*
      * primes_found determina la quantità di numeri primi incontrati fin'ora.
      */
@@ -46,13 +44,15 @@ unsigned short int nth_prime(unsigned short int n) {
      * La quantità aumenta se il numero iterato è primo.
      */
     // todo doesn't handle overflow well (values >= 6542)
-    unsigned short int i;
+    unsigned int i;
     for (i = 2;; i++) {
         if (is_prime(i)) {
-            if (primes_found >= n) return i;
+            if (primes_found >= n && i != USHRT_MAX) break;
             primes_found++;
         }
     }
+    if (i >= USHRT_MAX) return 0;
+    return i;
 }
 
 /* Ritorna la successione di numeri primi.
@@ -68,13 +68,17 @@ unsigned short int nth_prime(unsigned short int n) {
  * ritorna 0 e la seccessione viene resettata.
  */
 unsigned short int succ_prime(int reset) {
-    static unsigned short int prime = 1; 
+    static unsigned int prime = 1; 
     // todo find a way to hadnle overflow
     if (reset) {
         prime = 2;
         return prime;
     }
     prime = next_prime(prime);
+    if (prime >= USHRT_MAX ) {
+        prime = 2;
+        return 0;
+    }
     if (prime == 0) prime = 0;
     return prime;
 }
