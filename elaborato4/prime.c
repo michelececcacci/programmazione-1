@@ -43,7 +43,6 @@ unsigned short int nth_prime(unsigned short int n) {
      * è se la quantità di numeri primi incontrati combacia con n (> usato per sicurezza).
      * La quantità aumenta se il numero iterato è primo.
      */
-    // todo doesn't handle overflow well (values >= 6542)
     unsigned int i;
     for (i = 2;; i++) {
         if (is_prime(i)) {
@@ -69,7 +68,6 @@ unsigned short int nth_prime(unsigned short int n) {
  */
 unsigned short int succ_prime(int reset) {
     static unsigned int prime = 1; 
-    // todo find a way to hadnle overflow
     if (reset) {
         prime = 2;
         return prime;
@@ -85,7 +83,7 @@ unsigned short int succ_prime(int reset) {
 
 /* Ritorna 1 se m e n sono coprimi, 0 altrimenti. */
 unsigned short int co_prime(unsigned short int m, unsigned short int n) {
-    if (n >= USHRT_MAX) return 0;
+    if (m == 0 && n == 0) return 0;
     /*
      * Usa l' algoritmo di Euclide per computare l'mcd.
      */
