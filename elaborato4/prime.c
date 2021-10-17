@@ -2,8 +2,10 @@
 #include <math.h>
 #include "prime.h"
 
-/* Ritorna 1 se n e' primo, 0 altrimenti. */
+/* Ritorna il primo successivo a n */
 static unsigned int next_prime(unsigned int n);
+
+/* Ritorna 1 se n e' primo, 0 altrimenti. */
 unsigned short int is_prime(unsigned short int n) {
     /*
      * Un numero primo è maggiore di 1.
@@ -95,7 +97,7 @@ unsigned short int co_prime(unsigned short int m, unsigned short int n) {
     return n == 1;
 }
 
-/*Ritorna il primo successivo a n*/
+/* Ritorna il primo successivo a n */
 static unsigned int next_prime(unsigned int n){
     do {
         ++n; 
