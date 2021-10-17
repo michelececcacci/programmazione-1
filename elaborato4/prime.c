@@ -14,7 +14,7 @@ unsigned short int is_prime(unsigned short int n) {
      * se il resto della divisione tra il numero dato e tutti i numeri iterati
      * è diverso da zero (= non è un multiplo), il numero è primo.
      */
-    unsigned short int i = 0;
+    unsigned short int i;
     for (i = 2; i <= sqrt(n); ++i) {
         if (n % i == 0) {
             return 0;
@@ -99,7 +99,6 @@ unsigned short int co_prime(unsigned short int m, unsigned short int n) {
 static unsigned int next_prime(unsigned int n){
     do {
         ++n; 
-    }
-    while(!is_prime(n));
+    } while (!is_prime(n));
     return n;
 }
