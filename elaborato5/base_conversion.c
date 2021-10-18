@@ -41,5 +41,4 @@ static char convert_to_char(unsigned int n) {
     if (n > 9)
         return n - 10 + 'A';
     return '0' + n ;
-
 }
