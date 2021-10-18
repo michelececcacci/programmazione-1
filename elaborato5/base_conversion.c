@@ -8,30 +8,25 @@
 * diversamente le procedure non stampano nulla.
 */
 
-int main() {
-    base_conversion_it(123456, 12);
-    base_conversion_rc(123456, 12);
-    return 0;
-}
-
 static char convert_to_char(unsigned int n);
 
-// works, but in least singificant from most significant
-void base_conversion_rc(unsigned int n, unsigned int b) {
-    if (n == 0) return;
-    if (n > 0) {
-        base_conversion_rc(n / b, b);
-        printf("%c", convert_to_char(n % b));
-    }
+// works, but prints a 0 at the beginning
+void base_conversion_rc(unsigned int n, unsigned int b) { 
+    if (n > b)
+        base_conversion_rc(n / b, b); 
+    printf("%d", n % b);
 }
 
 
 // not working, prints number backwards
 void base_conversion_it(unsigned int n, unsigned int b) {
-    int digits;
-    for (digits = 0; n > 0; digits++) {
-        n /= b;
-        printf("%c", convert_to_char(n % b));
+    char ch;
+    int num, i, digits = (log(n) /log(b));
+    printf("digits: %d\n", digits);
+    for (i = digits; i > 0; i--){
+        num = n / ((int) pow(b, i));
+        ch = convert_to_char(num);
+        printf("%c", ch);
     }
     printf("\n");
 }
