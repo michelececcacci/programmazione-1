@@ -8,12 +8,20 @@
 * diversamente le procedure non stampano nulla.
 */
 
+int main() {
+    base_conversion_it(123456, 12);
+    base_conversion_rc(123456, 12);
+    return 0;
+}
+
+static char convert_to_char(unsigned int n);
+
 // works, but in least singificant from most significant
 void base_conversion_rc(unsigned int n, unsigned int b) {
     if (n == 0) return;
     if (n > 0) {
         base_conversion_rc(n / b, b);
-        printf("%d", n % b);
+        printf("%c", convert_to_char(n % b));
     }
 }
 
@@ -23,11 +31,12 @@ void base_conversion_it(unsigned int n, unsigned int b) {
     int digits;
     for (digits = 0; n > 0; digits++) {
         n /= b;
+        printf("%c", convert_to_char(n % b));
     }
-    printf("number of digits in new base: %d\n", digits);
+    printf("\n");
 }
 
-static char convert_to_base(int n) {
+static char convert_to_char(unsigned int n) {
     switch (n) {
         case 0:
             return '0';
