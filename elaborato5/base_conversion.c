@@ -30,7 +30,7 @@ void base_conversion_it(unsigned int n, unsigned int b) {
     printf("digits: %d\n", digits);
     // should print every digit of the other base in reverse . how?
     for (i = digits; i > 0; i--){
-        num = 
+        ch = 0;
         ch = convert_to_char(num);
         printf("%c", ch);
     }
