@@ -14,6 +14,11 @@ static char convert_to_char(unsigned int n);
 void base_conversion_rc(unsigned int n, unsigned int b) { 
     if (n > b)
         base_conversion_rc(n / b, b); 
+    char ch;
+    if (n > 9)
+        ch = n - 10 + 'A';
+    else 
+        ch = '0' + n ;
     printf("%c", convert_to_char(n % b));
 }
 
@@ -23,8 +28,9 @@ void base_conversion_it(unsigned int n, unsigned int b) {
     char ch;
     int num, i, digits = (log(n) /log(b));
     printf("digits: %d\n", digits);
+    // should print every digit of the other base in reverse . how?
     for (i = digits; i > 0; i--){
-        num = n / ((int) pow(b, i));
+        num = 
         ch = convert_to_char(num);
         printf("%c", ch);
     }
@@ -35,4 +41,5 @@ static char convert_to_char(unsigned int n) {
     if (n > 9)
         return n - 10 + 'A';
     return '0' + n ;
+
 }
