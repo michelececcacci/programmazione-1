@@ -27,9 +27,7 @@ void base_conversion_it(unsigned int n, unsigned int b) {
     printf("number of digits in new base: %d\n", digits);
 }
 
-
-char convert_to_base(int n) {
-    char ch;
+static char convert_to_base(int n) {
     switch (n) {
         case 0:
             return '0';
