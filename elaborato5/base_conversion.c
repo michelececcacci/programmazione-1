@@ -14,7 +14,7 @@ static char convert_to_char(unsigned int n);
 void base_conversion_rc(unsigned int n, unsigned int b) { 
     if (n > b)
         base_conversion_rc(n / b, b); 
-    printf("%d", n % b);
+    printf("%c", convert_to_char(n % b));
 }
 
 
