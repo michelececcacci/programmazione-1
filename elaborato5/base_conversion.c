@@ -9,8 +9,8 @@
 */
 
 static char convert_to_char(unsigned int n);
+static int get_n_digit(unsigned int n, int b, int digit);	
 
-// works, but prints a 0 at the beginning
 void base_conversion_rc(unsigned int n, unsigned int b) { 
     if (n > b)
         base_conversion_rc(n / b, b); 
@@ -23,14 +23,13 @@ void base_conversion_rc(unsigned int n, unsigned int b) {
 }
 
 
-// not working, prints number backwards
+// should work
 void base_conversion_it(unsigned int n, unsigned int b) {
     char ch;
     int num, i, digits = (log(n) /log(b));
     printf("digits: %d\n", digits);
-    // should print every digit of the other base in reverse . how?
-    for (i = digits; i > 0; i--){
-        ch = 0;
+    for (i = digits; i >= 0; i--){
+        num = get_n_digit(n, b, i);
         ch = convert_to_char(num);
         printf("%c", ch);
     }
@@ -41,4 +40,12 @@ static char convert_to_char(unsigned int n) {
     if (n > 9)
         return n - 10 + 'A';
     return '0' + n ;
+}
+
+static int get_n_digit(unsigned int n, int b, int digit){	
+	int i;
+	for (i = 0; i <= digit; i++){
+		n /= b;
+	}
+	return n % b;
 }
