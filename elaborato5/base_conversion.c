@@ -20,9 +20,9 @@ void base_conversion_rc(unsigned int n, unsigned int b) {
 }
 
 void base_conversion_it(unsigned int n, unsigned int b) {
-    int num, i, digits = (int) (log(n + 1) / log(b));
+    int num, i, digits = (int) (log(b == 2 ? n : n + 1) / log(b));
     /* printf("digits: %d\n", digits); */
-    for (i = digits -1; i >= -1; i--) {
+    for (i = digits - 1; i >= -1; i--) {
         num = get_n_digit(n, b, i);
         printf("%c", convert_to_char(num));
     }
