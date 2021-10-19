@@ -19,12 +19,10 @@ void base_conversion_rc(unsigned int n, unsigned int b) {
     printf("%c", convert_to_char(n % b));
 }
 
-
-// should work
 void base_conversion_it(unsigned int n, unsigned int b) {
     int num, i, digits = (int) (log(n) / log(b));
-    printf("digits: %d\n", digits);
-    for (i = digits; i >= 0; i--) {
+    /* printf("digits: %d\n", digits); */
+    for (i = digits - 1; i >= -1; i--) {
         num = get_n_digit(n, b, i);
         printf("%c", convert_to_char(num));
     }
