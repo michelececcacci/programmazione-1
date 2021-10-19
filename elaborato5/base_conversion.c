@@ -12,7 +12,7 @@ static unsigned char convert_to_char(unsigned int n);
 static int get_n_digit(unsigned int n, unsigned int b, int digit);
 
 void base_conversion_rc(unsigned int n, unsigned int b) {
-    if (n > b) {
+    if (n >= b) {
         base_conversion_rc(n / b, b);
     }
     unsigned char ch = n > 9 ? n - 10 + 'A' : '0' + n;
