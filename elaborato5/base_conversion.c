@@ -9,7 +9,7 @@
 */
 
 static unsigned char convert_to_char(unsigned int n);
-static unsigned int get_n_digit(unsigned int n, unsigned int b, unsigned int digit);
+static int get_n_digit(unsigned int n, unsigned int b, int digit);
 
 void base_conversion_rc(unsigned int n, unsigned int b) {
     if (n > b) {
@@ -22,13 +22,11 @@ void base_conversion_rc(unsigned int n, unsigned int b) {
 
 // should work
 void base_conversion_it(unsigned int n, unsigned int b) {
-    unsigned char ch;
-    unsigned int num, i, digits = (int) (log(n) / log(b));
+    int num, i, digits = (int) (log(n) / log(b));
     printf("digits: %d\n", digits);
     for (i = digits; i >= 0; i--) {
         num = get_n_digit(n, b, i);
-        ch = convert_to_char(num);
-        printf("%c", ch);
+        printf("%c", convert_to_char(num));
     }
     printf("\n");
 }
@@ -38,7 +36,7 @@ static unsigned char convert_to_char(unsigned int n) {
     return '0' + n;
 }
 
-static unsigned int get_n_digit(unsigned int n, unsigned int b, unsigned int digit) {
+static int get_n_digit(unsigned int n, unsigned int b, int digit) {
     int i;
     for (i = 0; i <= digit; i++) {
         n /= b;
