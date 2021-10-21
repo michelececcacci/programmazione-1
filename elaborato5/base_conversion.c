@@ -16,7 +16,7 @@ void base_conversion_rc(unsigned int n, unsigned int b) {
         if (n >= b) {
             base_conversion_rc(n / b, b);
         }
-        printf("%x", n % b);
+        printf("%X", n % b);
     }
 }
 
@@ -25,7 +25,7 @@ void base_conversion_it(unsigned int n, unsigned int b) {
         int num, i, digits = (int) (log(b == 2 ? n : n + 1) / log(b));
         for (i = digits - 1; i >= -1; i--) {
             num = get_n_digit(n, b, i);
-            printf("%x", num);
+            printf("%X", num);
         }
         printf("\n");
     }
