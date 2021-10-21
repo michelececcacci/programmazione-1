@@ -12,21 +12,24 @@ static unsigned char convert_to_char(unsigned int n);
 static int get_n_digit(unsigned int n, unsigned int b, int digit);
 
 void base_conversion_rc(unsigned int n, unsigned int b) {
-    if (n >= b) {
-        base_conversion_rc(n / b, b);
+    if (2 <= b && b <= 16) {
+        if (n >= b) {
+            base_conversion_rc(n / b, b);
+        }
+        unsigned char ch = n % b > 9 ? n % b  - 10 + 'A' : '0' + n % b;
+        printf("%c", ch);
     }
-    unsigned char ch = n > 9 ? n - 10 + 'A' : '0' + n;
-    printf("%c", convert_to_char(n % b));
 }
 
 void base_conversion_it(unsigned int n, unsigned int b) {
-    int num, i, digits = (int) (log(b == 2 ? n : n + 1) / log(b));
-    /* printf("digits: %d\n", digits); */
-    for (i = digits - 1; i >= -1; i--) {
-        num = get_n_digit(n, b, i);
-        printf("%c", convert_to_char(num));
+    if (2 <= b && b <= 16) {
+        int num, i, digits = (int) (log(b == 2 ? n : n + 1) / log(b));
+        for (i = digits - 1; i >= -1; i--) {
+            num = get_n_digit(n, b, i);
+            printf("%c", convert_to_char(num));
+        }
+        printf("\n");
     }
-    printf("\n");
 }
 
 static unsigned char convert_to_char(unsigned int n) {
