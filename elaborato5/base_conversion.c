@@ -21,6 +21,10 @@ void base_conversion_rc(unsigned int n, unsigned int b) {
 }
 
 void base_conversion_it(unsigned int n, unsigned int b) {
+    if (n == 0){
+        printf("0");
+        return;
+    }
     if (2 <= b && b <= 16) {
         int num, i, digits = (int) (log(b == 2 ? n : n + 1) / log(b));
         for (i = digits - 1; i >= -1; i--) {
