@@ -8,9 +8,10 @@
 * diversamente le procedure non stampano nulla.
 */
 
-static unsigned char convert_to_char(unsigned int n);
 static int get_n_digit(unsigned int n, unsigned int b, int digit);
 
+/* Tratta le funzioni come se fossero  uno stack, lasciando cosi la chiamata alla funzione che ha cifra di rilevanza piu bassa "aperta
+stampandola alla fine. In questo modo viene raggiutnto il risultato richiesto*/
 void base_conversion_rc(unsigned int n, unsigned int b) {
     if (2 <= b && b <= 16) {
         if (n >= b) {
@@ -20,6 +21,7 @@ void base_conversion_rc(unsigned int n, unsigned int b) {
     }
 }
 
+/* Usa un loop per stampare in ordine le cifre in ordine richiesto, che vengono prese con get_n_digit()*/
 void base_conversion_it(unsigned int n, unsigned int b) {
     if (n == 0){
         printf("0");
@@ -35,6 +37,7 @@ void base_conversion_it(unsigned int n, unsigned int b) {
     }
 }
 
+/* prende la cifra n del numero, usando il metodo delle divisoni successive. Usato nella funzione iterativa*/
 static int get_n_digit(unsigned int n, unsigned int b, int digit) {
     int i;
     for (i = 0; i <= digit; i++) {
