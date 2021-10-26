@@ -1,0 +1,12 @@
+NOTE ELABORATO6
+posizione iniziale 2 racchette = pad1_pos e pad2_pos
+posizione iniziale della palla definita da boll_pos
+racchette si muovono solo in dimensioni verticali e non possiamo spostare se y della racchett e = 0 oppure y + n - 1= height
+
+per posizione si puo semplicemente moltiplicare e usare i valori delle posizioni al posto di una matrice.
+FUNZIONI 
+setup_game: 
+dimensioni tavola di gioco fissate perintera durata del gioco da height e width
+posizione iniziale della palla viene specificata da punti x <= e 0 <= height (cosa vuol dire?)
+posizione iniziale della palla viene resettata ogni volta che uno dei due giocatori fa punto
+lunghezza delle 2 racchette specificata da argomento pad_len.
