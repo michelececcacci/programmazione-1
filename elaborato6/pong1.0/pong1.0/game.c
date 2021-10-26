@@ -32,10 +32,17 @@ void setup_game(int height, int width,
 	pad1.score = 0;
 	pad2.score = 0;
 	table.pad_len = pad_len;
+	ball.direction = ball_dir;
 }
 
 void move_ball() {
-	
+	if (ball.pos.y < 0 )
+		ball.direction.y  = 1;
+	if (ball.pos.y > table.height) {
+		ball.direction.y = -1;
+	}
+	ball.pos.x += ball.direction.x;
+	ball.pos.y += ball.direction.y;
 }
     
 /* the notation has the lowest point as width, height so this works	*/
