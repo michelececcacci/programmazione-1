@@ -49,19 +49,21 @@ void setup_game(int height, int width,
 void move_ball() {
 	if (ball.pos.y < 0 )
 		ball.direction.y  = 1;
-	if (ball.pos.y > table.height) {
+	if (ball.pos.y >= table.height) {
 		ball.direction.y = -1;
 	}
 	/* if point is scored */
-	if (ball.pos.x < 0 ){
-		pad1.score += 1;
-		reset_ball();
-	}
-	if (ball.pos.x > table.width) {
+	if (ball.pos.x <= table.pad_len ){
 		pad2.score += 1;
 		reset_ball();
+		return;
 	}
-	/* always used */
+	if (ball.pos.x >= table.width - table.pad_len) {
+		pad1.score += 1;
+		reset_ball();
+		return;
+	}
+	/* always used if a point is not scored*/
 	ball.pos.x += ball.direction.x;
 	ball.pos.y += ball.direction.y;
 }
@@ -120,3 +122,4 @@ static void detect_collisons(void) {
 }
 
 #endif
+
