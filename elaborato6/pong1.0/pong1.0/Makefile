@@ -9,10 +9,11 @@ display.o: display.h display.c
 	gcc $(CFLAG) -c display.c
 
 pong: game.h display.h game.o display.o main.c
-	gcc $(CFLAG) -lcurses display.o game.o main.c -o pong 
+	gcc $(CFLAG) display.o game.o main.c -o pong -lncurses
 
 pong_log: game.h display.h game.o display.o main.c
-	gcc $(CFLAG) -D REG -lcurses display.o game.o main.c -o pong_log 
+	gcc $(CFLAG) -D REG display.o game.o main.c -o pong_log -lncurses
 
 clean:
 	rm -rf *.o pong pong_log
+
