@@ -1,7 +1,7 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#include <curses.h>
+#include "curses.h"
 #include "game.h"
 
 #define QUIT     0x1B
