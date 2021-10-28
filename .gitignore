@@ -51,6 +51,5 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-elaborato6/pong1.0/pong1.0/Makefile
 elaborato6/pong1.0/pong1.0/curses.h
 elaborato6/pong1.0/pong1.0/panel.h
