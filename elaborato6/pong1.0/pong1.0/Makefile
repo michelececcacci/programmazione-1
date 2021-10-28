@@ -1,5 +1,11 @@
 CFLAG = -Wall -pedantic -Wno-comment -O3 -std=c89
-LDFLAGS = -lpdcurses
+LDFLAGS = -l
+
+ifeq ($(OS),Windows_NT)
+	LDFLAGS += pdcurses
+else
+	LDFLAGS += ncurses
+endif
 
 all: pong pong_log
 
