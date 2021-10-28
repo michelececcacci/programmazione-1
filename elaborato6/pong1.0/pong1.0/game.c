@@ -27,7 +27,7 @@ static struct ball {
 } ball;	
 
 /*
- * Le racchette
+ * Le racchette/pad
  */
 static struct pad {
 	struct position pos;
@@ -44,6 +44,18 @@ static void reset_ball(void);
  * Ritorna 1 se la palla interseca un pad, altrimenti 0
  */
 static int is_pad_hit(struct pad pad);
+
+/*
+ * Ritorna 1 se la palla colpisce il bordo superiore del pad, altrimenti 0
+ * Si basa solo sulla coordinata Y, è necessario chiamare is_pad_hit prima
+ */
+static int is_top_corner_hit(struct pad pad);
+
+/**
+ * Ritorna 1 se la palla colpisce il bordo superiore del pad, altrimenti 0
+ * Si basa solo sulla coordinata Y, è necessario chiamare is_pad_hit prima
+ */
+static int is_bottom_corner_hit(struct pad pad);
 
 void setup_game(int height, int width,
 	struct position ball_pos, struct position ball_dir,
@@ -78,7 +90,7 @@ void move_ball() {
 	}
 
     /* Se la palla colpisce le pareti in basso ed in alto, la sua direzione verticale viene invertita */
-    if (ball.pos.y <= 0 ) {
+    if (ball.pos.y <= 0) {
         ball.direction.y = DOWN;
     } else if (ball.pos.y >= table.height) {
         ball.direction.y = UP;
@@ -87,8 +99,18 @@ void move_ball() {
     /* Se la palla colpisce una racchetta, la sua direzione orizzontale viene invertita */
     if(is_pad_hit(pad1)) {
         ball.direction.x = RIGHT;
+        if(is_top_corner_hit(pad1)) {
+            ball.direction.y = UP;
+        } else if(is_bottom_corner_hit(pad1)) {
+            ball.direction.y = DOWN;
+        }
     } else if(is_pad_hit(pad2)) {
         ball.direction.x = LEFT;
+        if(is_top_corner_hit(pad2)) {
+            ball.direction.y = UP;
+        } else if(is_bottom_corner_hit(pad2)) {
+            ball.direction.y = DOWN;
+        }
     }
 
 	/* Viene aggiornata la posizione della palla in base alla sua direzione */
@@ -98,7 +120,7 @@ void move_ball() {
 
 void move_pad1_up(void) {
 	if (pad1.pos.y > 0)
-		pad1.pos.y++;
+		pad1.pos.y--;
 }
 
 void move_pad2_up(void) {
@@ -145,7 +167,15 @@ static void reset_ball(void) {
 }
 
 static int is_pad_hit(struct pad pad) {
-    return ball.pos.x + pad.type == pad.pos.x && ball.pos.y >= pad.pos.y && ball.pos.y <= pad.pos.y + table.pad_length;
+    return ball.pos.x + pad.type == pad.pos.x && ball.pos.y >= pad.pos.y - 1 && ball.pos.y <= pad.pos.y + table.pad_length + 1;
+}
+
+static int is_top_corner_hit(struct pad pad) {
+    return ball.pos.y == pad.pos.y - 1;
+}
+
+static int is_bottom_corner_hit(struct pad pad) {
+    return ball.pos.y == pad.pos.y + table.pad_length + 1;
 }
 
 #endif
