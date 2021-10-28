@@ -2,7 +2,7 @@
 #include "game.h"
 
 #define MIN(x,y) ((x)>(y) ? (y) : (x))
-#define DELAY        10
+#define DELAY        1
 #define PAD_OFFSET    4
 #define PAD_LEN_RATIO 5
 

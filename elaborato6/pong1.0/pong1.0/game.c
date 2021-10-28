@@ -3,90 +3,117 @@
 
 #include "game.h"
 
-/* TODO 
-decide how to implement pad collisions
-implement pads collisions 
-after everything works manually, optimize for test cases
-*/
-/* since the pad len is the same and doesn't change it is stored in game_table */
-/* not sure if this should be static */
-static struct game_table {
+#define LEFT -1
+#define RIGHT 1
+#define UP   -1
+#define DOWN  1
+
+/*
+ * La tavola da gioco
+ */
+static struct table {
 	int width;
 	int height;
-	int pad_len;
+    int pad_length;
 } table;
 
-/* direction is still not implemented */
-static struct ball_struct {
+/*
+ * La palla
+ */
+static struct ball {
 	struct position pos;
 	struct position direction;
 	struct position initial_pos;
 } ball;	
 
+/*
+ * Le racchette
+ */
 static struct pad {
 	struct position pos;
+    int type; /* LEFT o RIGHT */
 	int score;
 } pad1, pad2;
 
+/*
+ * Riporta la palla alla sua posizione iniziale
+ */
 static void reset_ball(void);
+
+/*
+ * Ritorna 1 se la palla interseca un pad, altrimenti 0
+ */
+static int is_pad_hit(struct pad pad);
 
 void setup_game(int height, int width,
 	struct position ball_pos, struct position ball_dir,
-	struct position pad1_pos, struct position pad2_pos, int pad_len) {	
+	struct position pad1_pos, struct position pad2_pos, int pad_len) {
 	table.height = height;
 	table.width = width;
+    table.pad_length = pad_len;
+
 	ball.pos =  ball_pos;
-	pad1.pos = pad1_pos;	
-	pad2.pos = pad2_pos;
-	pad1.score = 0;
-	pad2.score = 0;
-	table.pad_len = pad_len;
-	ball.direction = ball_dir;
-	/* used to restore postion when point is scored */
-	ball.initial_pos = ball_pos;
+    ball.direction = ball_dir;
+    ball.initial_pos = ball_pos;
+
+    pad1.pos = pad1_pos;
+    pad2.type = LEFT;
+    pad1.score = 0;
+
+    pad2.pos = pad2_pos;
+    pad2.type = RIGHT;
+    pad2.score = 0;
 }
 
 void move_ball() {
-	if (ball.pos.y < 0 )
-		ball.direction.y  = 1;
-	if (ball.pos.y >= table.height) {
-		ball.direction.y = -1;
-	}
-	/* if point is scored */
-	if (ball.pos.x <= table.pad_len ){
-		pad2.score += 1;
+	/* Se la palla colpisce le pareti a destra e a sinistra, un punto viene segnato */
+	if (ball.pos.x <= 0) {
+		pad2.score++;
+		reset_ball();
+		return;
+	} else if (ball.pos.x >= table.width) {
+		pad1.score++;
 		reset_ball();
 		return;
 	}
-	if (ball.pos.x >= table.width - table.pad_len) {
-		pad1.score += 1;
-		reset_ball();
-		return;
-	}
-	/* always used if a point is not scored*/
+
+    /* Se la palla colpisce le pareti in basso ed in alto, la sua direzione verticale viene invertita */
+    if (ball.pos.y <= 0 ) {
+        ball.direction.y = DOWN;
+    } else if (ball.pos.y >= table.height) {
+        ball.direction.y = UP;
+    }
+
+    /* Se la palla colpisce una racchetta, la sua direzione orizzontale viene invertita */
+    if(is_pad_hit(pad1)) {
+        ball.direction.x = RIGHT;
+    } else if(is_pad_hit(pad2)) {
+        ball.direction.x = LEFT;
+    }
+
+	/* Viene aggiornata la posizione della palla in base alla sua direzione */
 	ball.pos.x += ball.direction.x;
 	ball.pos.y += ball.direction.y;
 }
-    
-/* the notation has the lowest point as width, height so this works	*/
+
 void move_pad1_up(void) {
 	if (pad1.pos.y > 0)
-		pad1.pos.y -= 1;	
+		pad1.pos.y++;
 }
 
 void move_pad2_up(void) {
 	if (pad2.pos.y > 0)
-		pad2.pos.y -= 1;	
+		pad2.pos.y--;
 }
 
 void move_pad1_down(void) {
-	if (pad1.pos.y < (table.height- table.pad_len + 1))
-		pad1.pos.y += 1;	
+	if (pad1.pos.y < (table.height - table.pad_length + 1))
+		pad1.pos.y++;
 }
 
 void move_pad2_down(void) {
-	if (pad2.pos.y < (table.height- table.pad_len + 1))
-		pad2.pos.y += 1;	
+	if (pad2.pos.y < (table.height - table.pad_length + 1))
+		pad2.pos.y++;
 }
 
 unsigned int get_pad1_score(void) {
@@ -110,15 +137,15 @@ struct position get_pad2_pos(void) {
 }
 
 unsigned int get_pad_len(void) {
-	return table.pad_len;
+	return table.pad_length;
 }
 
-static void reset_ball(void){
+static void reset_ball(void) {
 	ball.pos = ball.initial_pos;
 }
 
-static void detect_collisons(void) {
-	ball.direction.x = - ball.direction.x;
+static int is_pad_hit(struct pad pad) {
+    return ball.pos.x + pad.type == pad.pos.x && ball.pos.y >= pad.pos.y && ball.pos.y <= pad.pos.y + table.pad_length;
 }
 
 #endif
