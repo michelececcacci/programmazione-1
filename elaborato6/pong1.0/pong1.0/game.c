@@ -83,7 +83,7 @@ void move_ball() {
 		pad2.score++;
 		reset_ball();
 		return;
-	} else if (ball.pos.x >= table.width - table.pad_length) {
+	} else if (ball.pos.x > (table.width -2)) {
 		pad1.score++;
 		reset_ball();
 		return;
