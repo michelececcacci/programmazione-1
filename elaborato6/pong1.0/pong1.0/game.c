@@ -41,21 +41,14 @@ static struct pad {
 static void reset_ball(void);
 
 /*
- * Ritorna 1 se la palla interseca un pad, altrimenti 0
+	ritorna 1 se la palla ha un tocco pieno, se no ritorna 0
  */
-static int is_pad_hit(struct pad pad);
+static int is_full_touch(struct pad pad);
+static int pad2_hitting(struct pad pad);
+static int pad1_hitting(struct pad pad);
+static int top_hitting(struct pad pad);
+static int bottom_hitting(struct pad pad);
 
-/*
- * Ritorna 1 se la palla colpisce il bordo superiore del pad, altrimenti 0
- * Si basa solo sulla coordinata Y, è necessario chiamare is_pad_hit prima
- */
-static int is_top_corner_hit(struct pad pad);
-
-/**
- * Ritorna 1 se la palla colpisce il bordo superiore del pad, altrimenti 0
- * Si basa solo sulla coordinata Y, è necessario chiamare is_pad_hit prima
- */
-static int is_bottom_corner_hit(struct pad pad);
 
 void setup_game(int height, int width,
 	struct position ball_pos, struct position ball_dir,
@@ -69,11 +62,11 @@ void setup_game(int height, int width,
     ball.initial_pos = ball_pos;
 
     pad1.pos = pad1_pos;
-    pad2.type = LEFT;
+    pad1.type = LEFT;
     pad1.score = 0;
 
     pad2.pos = pad2_pos;
-    pad2.type = RIGHT;
+    pad2.type = 2;
     pad2.score = 0;
 }
 
@@ -97,21 +90,35 @@ void move_ball() {
     }
 
     /* Se la palla colpisce una racchetta, la sua direzione orizzontale viene invertita */
-    if(is_pad_hit(pad1)) {
-        ball.direction.x = RIGHT;
-        if(is_top_corner_hit(pad1)) {
-            ball.direction.y = UP;
-        } else if(is_bottom_corner_hit(pad1)) {
-            ball.direction.y = DOWN;
-        }
-    } else if(is_pad_hit(pad2)) {
-        ball.direction.x = LEFT;
-        if(is_top_corner_hit(pad2)) {
-            ball.direction.y = UP;
-        } else if(is_bottom_corner_hit(pad2)) {
-            ball.direction.y = DOWN;
-        }
-    }
+	if (is_full_touch(pad1)){
+		ball.direction.x = RIGHT;
+	}
+	/* se la posizione della palla è compresa tra quella di pad-1, pad e pad+1 allora  é possibile che si tocchi (per pad1)*/ 
+	else if (pad1_hitting(pad1)){
+		if (top_hitting(pad1)){
+			ball.direction.x = RIGHT;
+			ball.direction.x = UP;
+		}
+		if (bottom_hitting(pad1)){
+			ball.direction.x = RIGHT;
+			ball.direction.y = DOWN;
+		}
+	}
+
+	if (is_full_touch(pad2)){
+	/* se tocca l' angolo superiore */
+		ball.direction.x = LEFT;
+	}
+	else if (pad2_hitting(pad2)){
+		if (bottom_hitting(pad2)) {
+			ball.direction.x = LEFT;
+			ball.direction.y = DOWN;
+		if (top_hitting(pad2)){
+			ball.direction.x = LEFT;
+			ball.direction.y = UP;
+		}
+	}
+	}
 
 	/* Viene aggiornata la posizione della palla in base alla sua direzione */
 	ball.pos.x += ball.direction.x;
@@ -119,22 +126,22 @@ void move_ball() {
 }
 
 void move_pad1_up(void) {
-	if (pad1.pos.y > 0)
+	if (pad1.pos.y > 0 && !pad1_hitting(pad1) && !top_hitting(pad1))
 		pad1.pos.y--;
 }
 
 void move_pad2_up(void) {
-	if (pad2.pos.y > 0)
+	if (pad2.pos.y > 0 )
 		pad2.pos.y--;
 }
 
 void move_pad1_down(void) {
-	if (pad1.pos.y < (table.height - table.pad_length + 1))
+	if ((pad1.pos.y < table.height - table.pad_length + 1) )
 		pad1.pos.y++;
 }
 
 void move_pad2_down(void) {
-	if (pad2.pos.y < (table.height - table.pad_length + 1))
+	if ((pad2.pos.y < table.height - table.pad_length + 1) )
 		pad2.pos.y++;
 }
 
@@ -166,17 +173,24 @@ static void reset_ball(void) {
 	ball.pos = ball.initial_pos;
 }
 
-static int is_pad_hit(struct pad pad) {
-    return ball.pos.x + pad.type == pad.pos.x && ball.pos.y >= pad.pos.y - 1 && ball.pos.y <= pad.pos.y + table.pad_length + 1;
+static int is_full_touch(struct pad pad) {
+	return ball.pos.x + pad.type == pad.pos.x && ball.pos.y >= pad.pos.y - 1 && ball.pos.y <= pad.pos.y + table.pad_length + 1;
 }
 
-static int is_top_corner_hit(struct pad pad) {
-    return ball.pos.y == pad.pos.y - 1;
+static int pad1_hitting(struct pad pad){
+	return (ball.pos.x  == pad.pos.x || ball.pos.x  == pad.pos.x +1 || ball.pos.x  == pad.pos.x -1);
 }
 
-static int is_bottom_corner_hit(struct pad pad) {
-    return ball.pos.y == pad.pos.y + table.pad_length + 1;
+static int pad2_hitting(struct pad pad){
+	return (ball.pos.x == pad.pos.x -2 || ball.pos.x == pad.pos.x - 1 || ball.pos.x == pad.pos.x); 
+	/* todo mettere +-1 */
+}
+
+static int top_hitting(struct pad pad){
+	return (ball.pos.y == pad.pos.y - 1);
+}
+static int bottom_hitting(struct pad pad){
+	return (ball.pos.y == pad.pos.y +table.pad_length - 1);
 }
 
 #endif
-
