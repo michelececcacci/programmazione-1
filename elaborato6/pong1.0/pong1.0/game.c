@@ -97,7 +97,7 @@ void move_ball() {
 	else if (pad1_hitting(pad1)){
 		if (top_hitting(pad1)){
 			ball.direction.x = RIGHT;
-			ball.direction.x = UP;
+			ball.direction.y = UP;
 		}
 		if (bottom_hitting(pad1)){
 			ball.direction.x = RIGHT;
@@ -126,7 +126,7 @@ void move_ball() {
 }
 
 void move_pad1_up(void) {
-	if (pad1.pos.y > 0 && !pad1_hitting(pad1) && !top_hitting(pad1))
+	if (pad1.pos.y > 0 )
 		pad1.pos.y--;
 }
 
@@ -174,7 +174,7 @@ static void reset_ball(void) {
 }
 
 static int is_full_touch(struct pad pad) {
-	return ball.pos.x + pad.type == pad.pos.x && ball.pos.y >= pad.pos.y - 1 && ball.pos.y <= pad.pos.y + table.pad_length + 1;
+	return (ball.pos.x + pad.type == pad.pos.x) && (ball.pos.y >= pad.pos.y - 1) && (ball.pos.y < pad.pos.y + table.pad_length + 1);
 }
 
 static int pad1_hitting(struct pad pad){
@@ -182,7 +182,7 @@ static int pad1_hitting(struct pad pad){
 }
 
 static int pad2_hitting(struct pad pad){
-	return (ball.pos.x == pad.pos.x -2 || ball.pos.x == pad.pos.x - 1 || ball.pos.x == pad.pos.x); 
+	return (ball.pos.x == pad.pos.x +2 || ball.pos.x == pad.pos.x + 1 || ball.pos.x == pad.pos.x); 
 	/* todo mettere +-1 */
 }
 
@@ -190,7 +190,7 @@ static int top_hitting(struct pad pad){
 	return (ball.pos.y == pad.pos.y - 1);
 }
 static int bottom_hitting(struct pad pad){
-	return (ball.pos.y == pad.pos.y +table.pad_length - 1);
+	return (ball.pos.y == pad.pos.y +table.pad_length);
 }
 
 #endif

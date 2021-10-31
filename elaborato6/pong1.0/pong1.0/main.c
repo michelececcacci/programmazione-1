@@ -2,7 +2,7 @@
 #include "game.h"
 
 #define MIN(x,y) ((x)>(y) ? (y) : (x))
-#define DELAY        1
+#define DELAY       10 
 #define PAD_OFFSET    4
 #define PAD_LEN_RATIO 5
 
@@ -89,6 +89,7 @@ int main() {
 	#ifdef REG
 	fclose(fp);
   #endif
+  return 0;
 }
 
 /* Starting pad1 position */
