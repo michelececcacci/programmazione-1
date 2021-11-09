@@ -14,6 +14,8 @@ static int is_nearby(unsigned int targetX, unsigned int targetY, unsigned int ch
  */
 static int rand_bool();
 
+static int mines_nearby(int board[][GAME_COLS], unsigned int x, unsigned int y);
+
 /*
  * Fills the rows*cols board with num_mines random mines
  * leaving free the neighborhood of position i,j
@@ -23,11 +25,11 @@ void random_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, 
     unsigned int curr_row, curr_col, count = 0;
     for (curr_row  = 0; curr_row < rows; curr_row++){
         for (curr_col = 0; curr_col < cols; curr_col++){
-            if ((count >= num_mines || is_nearby(curr_row, curr_col, i, j)) && !rand_bool()) {
-                board[curr_row][curr_col] = UNKN_FREE;
-            } else {
+            if (count < num_mines && !is_nearby(curr_row, curr_col, i, j) && rand_bool()) {
                 board[curr_row][curr_col] = UNKN_MINE;
                 count++;
+            } else {
+                board[curr_row][curr_col] = UNKN_FREE;
             }
         }
     }
@@ -44,8 +46,7 @@ void random_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, 
 *    displayed. Puts a flag in position i,j.
 */
 int flag_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, unsigned int i, unsigned int j) {
-    int flag = board[i][j];
-    switch (flag) {
+    switch (board[i][j]) {
         case FLAG_FREE:
             board[i][j] = UNKN_FREE;
             return -1;
@@ -68,7 +69,14 @@ int flag_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, uns
 */
 
 int display_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, unsigned int i, unsigned int j) {
-
+    switch (board[i][j]) {
+        case UNKN_MINE:
+            board[i][j] = MINE;
+            return -1;
+        case UNKN_FREE:
+            board[i][j] = mines_nearby(board, i, j); /* todo ricorsivo  */
+            return 1;
+    }
     return 0;
 }
 
@@ -89,7 +97,20 @@ static int is_nearby(unsigned int targetX, unsigned int targetY, unsigned int ch
 }
 
 static int rand_bool() {
-    return rand() % 2;
+    return rand() % 10 == 0;
+}
+
+static int mines_nearby(int board[][GAME_COLS], unsigned int x, unsigned int y) {
+    int mines = 0;
+    unsigned int i, j;
+    for(j = y - 1; j <= y + 1; j++) {
+        for(i = x - 1; j <= x + 1; j++) {
+            /* Controllo se le coordinate appartengono alla griglia */
+            if(x >= 0 && x < GAME_COLS && y >= 0 && y < GAME_ROWS)
+                if(board[i][j] == UNKN_MINE || board[i][j] == MINE) mines++;
+        }
+    }
+    return mines;
 }
 
 #endif
