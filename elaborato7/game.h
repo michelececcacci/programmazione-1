@@ -1,17 +1,15 @@
-//DO NOT CHANGE
-
 #ifndef GAME_H
 #define GAME_H
 
-#define GAME_ROWS       10
+#define GAME_ROWS       21
 #define GAME_COLS       GAME_ROWS
-#define PERC_MINE       15 // Percentage of mines in the board
+#define PERC_MINE       20 // Percentage of mines in the board
 
 /* Game status */
 enum status {CONTINUE, RESTART, GAMEOVER};
 
 /* Input actions for game update */
-enum input {LEFT, RIGHT, DOWN, UP, FLAG, DISPLAY, EXPAND, SAVE, LOAD, SHOW, FLAGALL, EXPANDALL, NONE};
+enum input {LEFT, RIGHT, DOWN, UP, FLAG, DISPLAY, EXPAND, NONE};
 
 struct game {
   unsigned int rows;         // Rows in the board matrix
@@ -47,4 +45,3 @@ void game_destroy(struct game *G);
 enum status game_update(struct game *G, enum input input);
 
 #endif
-

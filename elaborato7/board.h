@@ -1,9 +1,3 @@
-//USE "DEFINE" TO SELECT TEST
-//#define TEST_RANDOM
-//#define TEST_FLAG
-//#define TEST_DISPLAY
-#define TEST_EXPAND
-
 #ifndef BOARD_H
 #define BOARD_H
 
