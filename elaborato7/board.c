@@ -3,6 +3,7 @@
 #include "board.h"
 #include <time.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 /*
  * Verifica se le coordinate target si trovano nell'intorno 3x3 di check
@@ -23,7 +24,8 @@ static int mines_nearby(int board[][GAME_COLS], unsigned int x, unsigned int y);
 void random_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, unsigned int i, unsigned int j, unsigned int num_mines) {
     srand(time(NULL)); /* Inizializzazione del seed random */
     unsigned int curr_row, curr_col, count = 0;
-    for (curr_row  = 0; curr_row < rows; curr_row++){
+    while  (count < num_mines){
+        for (curr_row  = 0; curr_row < rows; curr_row++){
         for (curr_col = 0; curr_col < cols; curr_col++){
             if (count < num_mines && !is_nearby(curr_row, curr_col, i, j) && rand_bool()) {
                 board[curr_row][curr_col] = UNKN_MINE;
@@ -33,8 +35,9 @@ void random_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, 
             }
         }
     }
+ 
+    }
 }
-
 
 
 
