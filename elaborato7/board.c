@@ -44,8 +44,22 @@ void random_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, 
 *    displayed. Puts a flag in position i,j.
 */
 int flag_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, unsigned int i, unsigned int j) {
+    int flag = board[i][j];
+    switch (flag) {
+        case FLAG_FREE:
+            board[i][j] = UNKN_FREE;
+            return -1;
+        case FLAG_MINE:
+            board[i][j] = UNKN_MINE;
+            return -1;
+            case UNKN_FREE:
+            board[i][j] = FLAG_FREE;
+            return 1;
+        case UNKN_MINE:
+            board[i][j] = FLAG_MINE;
+            return 1;
+    }
     return 0;
-    
 }
 
 /*
