@@ -3,7 +3,7 @@
 
 #define GAME_ROWS       21
 #define GAME_COLS       GAME_ROWS
-#define PERC_MINE       20 // Percentage of mines in the board
+#define PERC_MINE       20 
 
 /* Game status */
 enum status {CONTINUE, RESTART, GAMEOVER};
@@ -12,14 +12,14 @@ enum status {CONTINUE, RESTART, GAMEOVER};
 enum input {LEFT, RIGHT, DOWN, UP, FLAG, DISPLAY, EXPAND, NONE};
 
 struct game {
-  unsigned int rows;         // Rows in the board matrix
-  unsigned int cols;         // Cols in the board matrix
-	unsigned int flags;        // Number of flagged entries
-	unsigned int mines;        // Number of mines
-	unsigned int displayed;    // Number of displayed entries
-	unsigned int cursor_row;   // Cursor row position
-	unsigned int cursor_col;   // Cursor col position
-	int board[GAME_ROWS][GAME_COLS]; // Board matrix
+  unsigned int rows;         
+  unsigned int cols;         
+	unsigned int flags;        
+	unsigned int mines;        
+	unsigned int displayed;    
+	unsigned int cursor_row;   
+	unsigned int cursor_col;   
+	int board[GAME_ROWS][GAME_COLS]; 
 };
 
 

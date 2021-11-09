@@ -14,7 +14,7 @@ struct game *game_create(void) {
 		G->mines      = (PERC_MINE * GAME_ROWS * GAME_COLS)/100;
 		G->flags      = 0;
 		G->displayed  = 0;
-		// Puts the cursor approximatively in the middle of the board
+		/* Puts the cursor approximatively in the middle of the board */
 		G->cursor_row = G->rows/2;
 		G->cursor_col = G->cols/2;
 	}
@@ -43,16 +43,14 @@ enum status game_update(struct game *G, enum input input) {
 		case UP     : if(G->cursor_row > 0)         G->cursor_row--; break;
 		case DOWN   : if(G->cursor_row < G->rows-1) G->cursor_row++; break;
 		case FLAG   : G->flags += flag_board(G->board,G->rows,G->cols,G->cursor_row,G->cursor_col);
-									if(G->flags > G->mines) // Undo flag
+									if(G->flags > G->mines) 
 										G->flags += flag_board(G->board,G->rows,G->cols,G->cursor_row,G->cursor_col);
 									break;
 		case EXPAND : c = expand_board(G->board, G->rows, G->cols, G->cursor_row, G->cursor_col);
-									// gameover if either an unflagged  mine or all the free cells have been  displayed
 									if (c == -1 || (G->displayed += c) == G->rows*G->cols - G->mines)
 										stat = GAMEOVER;
 									break;
 		case DISPLAY: c = display_board(G->board,G->rows,G->cols,G->cursor_row,G->cursor_col);
-									// gameover if either a mine or all the free cells have been  displayed
 									if(c == -1 || (G->displayed += c) == G->rows*G->cols - G->mines) 
 										stat = GAMEOVER;
 									break;

@@ -13,10 +13,9 @@ int main() {
 
 		display_open();
 
-		// Creates a board that fits into the display
 		G = game_create();
 
-		if(G == NULL) { // Allocation error
+		if(G == NULL) {
 			display_close();
 			fprintf(stderr,"Error: cannot initialize the game\n");
 			return 1;
@@ -55,11 +54,9 @@ int main() {
 							default:          stat = CONTINUE; break;
 						}
 					} while(stat == CONTINUE);
-					// The game is over: either quit or restart
 				}
 			} while(input == NONE && stat == CONTINUE); 
 		} while(stat == CONTINUE); 
-		// If we are here either quit or restart
 
 		game_destroy(G);
 		display_close();

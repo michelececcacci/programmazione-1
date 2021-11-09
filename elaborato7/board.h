@@ -1,23 +1,23 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "game.h" // We need to know GAME_COLS
+#include "game.h" 
 
 enum field {
-	C0,         // The cell is sorrounded by 0 mines
-	C1,         // The cell is sorrounded by 1 mine
-	C2,         // The cell is sorrounded by 2 mines
-	C3,         // The cell is sorrounded by 3 mines
-	C4,         // The cell is sorrounded by 4 mines
-	C5,         // The cell is sorrounded by 5 mines
-	C6,         // The cell is sorrounded by 6 mines
-	C7,         // The cell is sorrounded by 7 mines
-	C8,         // The cell is sorrounded by 8 mines
-	UNKN_FREE,  // The cell is not displayed and it is not a mine
-	UNKN_MINE,  // The cell is not displayed and it is a mine
-	FLAG_FREE,  // The cell is flagged and it is not a mine
-	FLAG_MINE,  // The cell is flagged and it s a mine
-	MINE        // The cell is a mine
+	C0,         /* The cell is sorrounded by 0 mines */
+	C1,         /* The cell is sorrounded by 1 mine */
+	C2,         /* The cell is sorrounded by 2 mines */
+	C3,         /* The cell is sorrounded by 3 mines */
+	C4,         /* The cell is sorrounded by 4 mines */
+	C5,         /* The cell is sorrounded by 5 mines */
+	C6,         /* The cell is sorrounded by 6 mines */
+	C7,         /* The cell is sorrounded by 7 mines */
+	C8,         /* The cell is sorrounded by 8 mines */
+	UNKN_FREE,  /* The cell is not displayed and it is not a mine */
+	UNKN_MINE,  /* The cell is not displayed and it is a mine */
+	FLAG_FREE,  /* The cell is flagged and it is not a mine */ 
+	FLAG_MINE,  /* The cell is flagged and it s a mine */
+	MINE        /* The cell is a mine */
 };
 
 /*

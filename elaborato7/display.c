@@ -3,19 +3,17 @@
 #include <limits.h>
 #include "display.h"
 
-// Draws the border of the board.
 static void display_border(struct game *G, unsigned int start_row, unsigned int start_col);
 
-// Draws the world.
 static void display_world(struct game *G, unsigned int start_row, unsigned int start_col, int gameover);
 
 void display_open(void) {
 	initscr();
 	cbreak();
 	noecho();               
-	keypad(stdscr, TRUE); // make keys work
-	curs_set(0);          // hide cursor
-	timeout(-1);          // Sets the waiting time for getch()
+	keypad(stdscr, TRUE); 
+	curs_set(0);          
+	timeout(-1);          
 	if(has_colors()) {
 		start_color();
 		init_pair(1,COLOR_WHITE,COLOR_BLACK);
@@ -60,10 +58,8 @@ void display_gameover(struct game *G) {
   display_world(G,start_row,start_col,1);
 	mvprintw(start_row + G->rows+1,start_col-1,"[Q]uit  [R]estart");
 	if(G->displayed == G->rows*G->cols-G->mines)
-		//mvprintw(start_row+G->rows+3,start_col+(((int)2*G->cols-strlen(str1))/2),str1);
 		mvprintw(start_row-3,start_col+(((int)2*G->cols-strlen(str1))/2),str1);
 	else
-		//mvprintw(start_row+G->rows+3,start_col+(((int)2*G->cols-strlen(str2))/2),str2);	
 		mvprintw(start_row-3,start_col+(((int)2*G->cols-strlen(str2))/2),str2);
 	refresh();
 }
@@ -169,7 +165,6 @@ static void display_world(struct game *G, unsigned int start_row, unsigned int s
 		mvaddch(start_row+G->cursor_row,start_col+2*G->cursor_col-1,CURS_SYMBOL_LEFT);
 		mvaddch(start_row+G->cursor_row,start_col+2*G->cursor_col+1,CURS_SYMBOL_RIGHT);
 
-		//mvprintw(start_row + G->rows+2,start_col-1,"%d, %d",G->cursor_row,G->cursor_col);
 }
 
 int display_read(void) {
