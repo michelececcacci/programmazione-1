@@ -9,7 +9,15 @@
  */
 static int is_nearby(unsigned int targetX, unsigned int targetY, unsigned int checkX, unsigned int checkY);
 
+/*
+ * Verifica il numero di mine nell'intorno 3x3 di x,y
+ */
 static int mines_nearby(int board[][GAME_COLS], unsigned int x, unsigned int y);
+
+/*
+ * Rivela le caselle nell'intorno 3x3 di x,y
+ */
+static void display_around(int board[][GAME_COLS], unsigned int x, unsigned int y);
 
 /*
  * Fills the rows*cols board with num_mines random mines
@@ -76,9 +84,14 @@ int display_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, 
         case MINE:
             board[i][j] = MINE;
             return -1;
-        case UNKN_FREE:
-            board[i][j] = mines_nearby(board, i, j); /* todo ricorsivo  */
+        case UNKN_FREE: {
+            int mines = mines_nearby(board, i, j);
+            board[i][j] = mines;
+            if(mines == 0) {
+                display_around(board, i, j);
+            }
             return 1;
+        }
     }
     return 0;
 }
@@ -110,6 +123,17 @@ static int mines_nearby(int board[][GAME_COLS], unsigned int x, unsigned int y) 
         }
     }
     return mines;
+}
+
+static void display_around(int board[][GAME_COLS], unsigned int x, unsigned int y) {
+    unsigned int i, j;
+    for(j = y - 1; j <= y + 1; j++) {
+        for(i = x - 1; i <= x + 1; i++) {
+            /* Controllo se le coordinate appartengono alla griglia */
+            if(i >= 0 && i < GAME_COLS && j >= 0 && j < GAME_ROWS)
+                if(board[i][j] != UNKN_MINE) display_board(board, GAME_ROWS, GAME_COLS, i, j);
+        }
+    }
 }
 
 #endif
