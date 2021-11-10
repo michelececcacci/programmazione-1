@@ -70,10 +70,10 @@ int flag_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, uns
 * Displays position i,j in the board. Returns the number of
 * displayed cells or -1 if i,j contains a mine.
 */
-
 int display_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, unsigned int i, unsigned int j) {
     switch (board[i][j]) {
         case UNKN_MINE:
+        case MINE:
             board[i][j] = MINE;
             return -1;
         case UNKN_FREE:
@@ -103,9 +103,9 @@ static int mines_nearby(int board[][GAME_COLS], unsigned int x, unsigned int y) 
     int mines = 0;
     unsigned int i, j;
     for(j = y - 1; j <= y + 1; j++) {
-        for(i = x - 1; j <= x + 1; j++) {
+        for(i = x - 1; i <= x + 1; i++) {
             /* Controllo se le coordinate appartengono alla griglia */
-            if(x >= 0 && x < GAME_COLS && y >= 0 && y < GAME_ROWS)
+            if(i >= 0 && i < GAME_COLS && j >= 0 && j < GAME_ROWS)
                 if(board[i][j] == UNKN_MINE || board[i][j] == MINE) mines++;
         }
     }
