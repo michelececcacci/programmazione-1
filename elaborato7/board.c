@@ -10,6 +10,11 @@
 static int is_nearby(unsigned int targetX, unsigned int targetY, unsigned int checkX, unsigned int checkY);
 
 /*
+ * Verifica se le coordinate fanno parte della griglia
+ */
+static int is_in_grid(unsigned int x, unsigned int y);
+
+/*
  * Verifica il numero di mine nell'intorno 3x3 di x,y
  */
 static int mines_nearby(int board[][GAME_COLS], unsigned int x, unsigned int y);
@@ -64,7 +69,7 @@ int flag_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, uns
         case FLAG_MINE:
             board[i][j] = UNKN_MINE;
             return -1;
-            case UNKN_FREE:
+        case UNKN_FREE:
             board[i][j] = FLAG_FREE;
             return 1;
         case UNKN_MINE:
@@ -87,7 +92,7 @@ int display_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, 
         case UNKN_FREE: {
             int mines = mines_nearby(board, i, j);
             board[i][j] = mines;
-            if(mines == 0) {
+            if(mines == C0) {
                 display_around(board, i, j);
             }
             return 1;
@@ -112,14 +117,18 @@ static int is_nearby(unsigned int targetX, unsigned int targetY, unsigned int ch
     return ((targetX >= checkX - 1 && targetX <= checkX + 1) && (targetY >= checkY - 1 && targetY <= checkY + 1));
 }
 
+static int is_in_grid(unsigned int x, unsigned int y) {
+    return x >= 0 && x < GAME_COLS && y >= 0 && y < GAME_ROWS;
+}
+
 static int mines_nearby(int board[][GAME_COLS], unsigned int x, unsigned int y) {
     int mines = 0;
     unsigned int i, j;
-    for(j = y - 1; j <= y + 1; j++) {
-        for(i = x - 1; i <= x + 1; i++) {
-            /* Controllo se le coordinate appartengono alla griglia */
-            if(i >= 0 && i < GAME_COLS && j >= 0 && j < GAME_ROWS)
+    for(j = y == 0 ? y : y - 1; j <= y + 1; j++) {
+        for(i = x == 0 ? x : x - 1; i <= x + 1; i++) {
+            if(is_in_grid(i, j)) {
                 if(board[i][j] == UNKN_MINE || board[i][j] == MINE) mines++;
+            }
         }
     }
     return mines;
@@ -127,10 +136,9 @@ static int mines_nearby(int board[][GAME_COLS], unsigned int x, unsigned int y) 
 
 static void display_around(int board[][GAME_COLS], unsigned int x, unsigned int y) {
     unsigned int i, j;
-    for(j = y - 1; j <= y + 1; j++) {
-        for(i = x - 1; i <= x + 1; i++) {
-            /* Controllo se le coordinate appartengono alla griglia */
-            if(i >= 0 && i < GAME_COLS && j >= 0 && j < GAME_ROWS)
+    for(j = y == 0 ? y : y - 1; j <= y + 1; j++) {
+        for(i = x == 0 ? x : x - 1; i <= x + 1; i++) {
+            if(is_in_grid(i, j))
                 if(board[i][j] != UNKN_MINE) display_board(board, GAME_ROWS, GAME_COLS, i, j);
         }
     }
