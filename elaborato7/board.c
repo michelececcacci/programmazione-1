@@ -90,8 +90,7 @@ int display_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, 
         case MINE:
             board[i][j] = MINE;
             return -1;
-        case UNKN_FREE:
-        case FLAG_FREE: {
+        case UNKN_FREE: {
             int mines = mines_nearby(board, i, j);
             board[i][j] = mines;
             return mines == C0 ? display_around(board, i, j) : mines;
