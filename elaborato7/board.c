@@ -7,7 +7,7 @@
 /*
  * Verifica se le coordinate target si trovano nell'intorno 3x3 di check
  */
-static int is_nearby(unsigned int targetX, unsigned int targetY, unsigned int checkX, unsigned int checkY);
+static int is_nearby(unsigned int target_x, unsigned int target_y, unsigned int check_x, unsigned int check_y);
 
 /*
  * Verifica se le coordinate fanno parte della griglia
@@ -40,15 +40,15 @@ void random_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, 
     }
 
     /* Vengono generate le mine */
-    unsigned int mineIndex;
-    for(mineIndex = 0; mineIndex <= num_mines; mineIndex++) {
-        unsigned int mineX, mineY;
+    unsigned int mine_index;
+    for(mine_index = 0; mine_index < num_mines; mine_index++) {
+        unsigned int mine_x, mine_y;
         /* Vengono generate le coordinate da 0 a <grandezza griglia> */
         do {
-            mineX = rand() % GAME_COLS;
-            mineY = rand() % GAME_ROWS;
-        } while (board[mineX][mineY] == UNKN_MINE || is_nearby(mineX, mineY, i, j));
-        board[mineX][mineY] = UNKN_MINE;
+            mine_x = rand() % GAME_COLS;
+            mine_y = rand() % GAME_ROWS;
+        } while (board[mine_x][mine_y] == UNKN_MINE || is_nearby(mine_x, mine_y, i, j));
+        board[mine_x][mine_y] = UNKN_MINE;
     }
 }
 
@@ -93,7 +93,7 @@ int display_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, 
         case UNKN_FREE: {
             int mines = mines_nearby(board, i, j);
             board[i][j] = mines;
-            return mines == C0 ? display_around(board, i, j) : mines;
+            return (mines == C0) ? display_around(board, i, j) : mines;
         }
     }
     return 0;
@@ -111,8 +111,8 @@ int expand_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, u
     return 0;
 }
 
-static int is_nearby(unsigned int targetX, unsigned int targetY, unsigned int checkX, unsigned int checkY) {
-    return ((targetX >= checkX - 1 && targetX <= checkX + 1) && (targetY >= checkY - 1 && targetY <= checkY + 1));
+static int is_nearby(unsigned int target_x, unsigned int target_y, unsigned int checkX, unsigned int check_y) {
+    return ((target_x >= checkX - 1 && target_x <= checkX + 1) && (target_y >= check_y - 1 && target_y <= check_y + 1));
 }
 
 static int is_in_grid(unsigned int x, unsigned int y) {
