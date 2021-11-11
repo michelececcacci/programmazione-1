@@ -22,7 +22,7 @@ static int mines_nearby(int board[][GAME_COLS], unsigned int x, unsigned int y);
 /*
  * Rivela le caselle nell'intorno 3x3 di x,y
  */
-static void display_around(int board[][GAME_COLS], unsigned int x, unsigned int y);
+static int display_around(int board[][GAME_COLS], unsigned int x, unsigned int y);
 
 /*
  * Fills the rows*cols board with num_mines random mines
@@ -86,16 +86,15 @@ int flag_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, uns
 int display_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, unsigned int i, unsigned int j) {
     switch (board[i][j]) {
         case UNKN_MINE:
+        case FLAG_MINE:
         case MINE:
             board[i][j] = MINE;
             return -1;
-        case UNKN_FREE: {
+        case UNKN_FREE:
+        case FLAG_FREE: {
             int mines = mines_nearby(board, i, j);
             board[i][j] = mines;
-            if(mines == C0) {
-                display_around(board, i, j);
-            }
-            return 1;
+            return mines == C0 ? display_around(board, i, j) : mines;
         }
     }
     return 0;
@@ -127,21 +126,23 @@ static int mines_nearby(int board[][GAME_COLS], unsigned int x, unsigned int y) 
     for(j = y == 0 ? y : y - 1; j <= y + 1; j++) {
         for(i = x == 0 ? x : x - 1; i <= x + 1; i++) {
             if(is_in_grid(i, j)) {
-                if(board[i][j] == UNKN_MINE || board[i][j] == MINE) mines++;
+                if(board[i][j] == UNKN_MINE || board[i][j] == MINE || board[i][j] == FLAG_MINE) mines++;
             }
         }
     }
     return mines;
 }
 
-static void display_around(int board[][GAME_COLS], unsigned int x, unsigned int y) {
+static int display_around(int board[][GAME_COLS], unsigned int x, unsigned int y) {
+    int count = 0; /* Posizioni svelate */
     unsigned int i, j;
     for(j = y == 0 ? y : y - 1; j <= y + 1; j++) {
         for(i = x == 0 ? x : x - 1; i <= x + 1; i++) {
             if(is_in_grid(i, j))
-                if(board[i][j] != UNKN_MINE) display_board(board, GAME_ROWS, GAME_COLS, i, j);
+                if(board[i][j] != UNKN_MINE) count += display_board(board, GAME_ROWS, GAME_COLS, i, j);
         }
     }
+    return count;
 }
 
 #endif
