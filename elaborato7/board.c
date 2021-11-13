@@ -22,9 +22,15 @@ static int is_in_grid(unsigned int x, unsigned int y);
 static int mines_nearby(int board[][GAME_COLS], unsigned int x, unsigned int y);
 
 /*
- * Rivela le caselle nell'intorno 3x3 di x,y
+ * Verifica il numero di flags nell'intorno 3x3 di x,y
  */
-static int display_around(int board[][GAME_COLS], unsigned int x, unsigned int y);
+static int flags_nearby(int board[][GAME_COLS], unsigned int x, unsigned int y);
+
+/*
+ * Rivela le caselle nell'intorno 3x3 di x,y
+ * Se exit_on_mine è vero, la funzione ritorna -1 se è presente una mina
+ */
+static int display_around(int board[][GAME_COLS], unsigned int x, unsigned int y, int exit_on_mine);
 
 /*
  * Fills the rows*cols board with num_mines random mines
@@ -133,12 +139,12 @@ int display_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, 
  * one contains a mine.
  */
 int expand_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, unsigned int i, unsigned int j) {
-
-    return 0;
+    if(board[i][j] > C8 || board[i][j] != flags_nearby(board, i, j)) return 0;
+    return display_around(board, i, j, 1);
 }
 
-static int is_nearby(unsigned int target_x, unsigned int target_y, unsigned int checkX, unsigned int check_y) {
-    return ((target_x >= checkX - 1 && target_x <= checkX + 1) && (target_y >= check_y - 1 && target_y <= check_y + 1));
+static int is_nearby(unsigned int target_x, unsigned int target_y, unsigned int check_x, unsigned int check_y) {
+    return ((target_x >= check_x - 1 && target_x <= check_x + 1) && (target_y >= check_y - 1 && target_y <= check_y + 1));
 }
 
 static int is_in_grid(unsigned int x, unsigned int y) {
@@ -158,13 +164,29 @@ static int mines_nearby(int board[][GAME_COLS], unsigned int x, unsigned int y) 
     return mines;
 }
 
-static int display_around(int board[][GAME_COLS], unsigned int x, unsigned int y) {
+static int flags_nearby(int board[][GAME_COLS], unsigned int x, unsigned int y) {
+    int flags = 0;
+    unsigned int i, j;
+    for(j = y == 0 ? y : y - 1; j <= y + 1; j++) {
+        for(i = x == 0 ? x : x - 1; i <= x + 1; i++) {
+            if(is_in_grid(i, j)) {
+                if(board[i][j] == FLAG || board[i][j] == FLAG_MINE || board[i][j] == FLAG_FREE) flags++;
+            }
+        }
+    }
+    return flags;
+}
+
+static int display_around(int board[][GAME_COLS], unsigned int x, unsigned int y, int exit_on_mine) {
     int count = 0; /* Posizioni svelate */
     unsigned int i, j;
     for(j = y == 0 ? y : y - 1; j <= y + 1; j++) {
         for(i = x == 0 ? x : x - 1; i <= x + 1; i++) {
             if(is_in_grid(i, j))
-                if(board[i][j] != UNKN_MINE) count += display_board(board, GAME_ROWS, GAME_COLS, i, j);
+                if(board[i][j] != FLAG_FREE && board[i][j] != FLAG_MINE) {
+                    if(exit_on_mine && board[i][j] == UNKN_MINE) return -1;
+                    count += display_board(board, GAME_ROWS, GAME_COLS, i, j);
+                }
         }
     }
     return count;
