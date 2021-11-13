@@ -4,6 +4,8 @@
 #include <time.h>
 #include <stdlib.h>
 
+#define HANDLE_START(x) !x ? x : x - 1
+#define HANDLE_END(y, par2) (y == par2 - 1) ? y : y +1
 /*
  * Verifica se le coordinate target si trovano nell'intorno 3x3 di check
  */
@@ -84,19 +86,43 @@ int flag_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, uns
 * displayed cells or -1 if i,j contains a mine.
 */
 int display_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, unsigned int i, unsigned int j) {
-    switch (board[i][j]) {
-        case UNKN_MINE:
-        case FLAG_MINE:
-        case MINE:
-            board[i][j] = MINE;
-            return -1;
-        case UNKN_FREE: {
-            int mines = mines_nearby(board, i, j);
-            board[i][j] = mines;
-            return (mines == C0) ? display_around(board, i, j) : mines;
+    int y_end, x_end, y_start, x_start, n_mines, ret_val, x, y, cell_val;
+    x_start = HANDLE_START(i);
+    y_start = HANDLE_START(j);
+    x_end = HANDLE_END(i, cols);
+    y_end = HANDLE_END(j, rows);
+    cell_val = board[i][j];
+    if (cell_val == UNKN_FREE){
+        n_mines = 0;
+        for (x = x_start; x <= x_end; x++) {
+            for (y = y_start; y <= y_end; y++){
+                if (board[x][y] == UNKN_MINE || board[x][y] == FLAG_MINE) 
+                    n_mines++;
+            }
+        }
+        board[i][j] = n_mines;
+        ret_val = 1;
+        if (!n_mines) {
+            for (x = x_start; x <= x_end; x++) {
+                for (y = y_start; y <= y_end; y++){
+                    if (x != i || y!= j) {
+                        cell_val = display_board(board, rows, cols, x, y);
+                        ret_val += cell_val;
+                    }
+                }
+            }
         }
     }
-    return 0;
+    else {
+        if (cell_val == UNKN_MINE){
+            board[i][j] = MINE;
+            ret_val = -1;
+        }
+        else {
+            ret_val = 0;
+        }
+    }
+    return ret_val;
 }
 
 
