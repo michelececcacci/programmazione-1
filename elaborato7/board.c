@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 #define HANDLE_START(x) !x ? x : x - 1
-#define HANDLE_END(y, par2) (y == par2 - 1) ? y : y +1
+#define HANDLE_END(y, par2) (y == par2 - 1) ? y : y + 1
 /*
  * Verifica se le coordinate target si trovano nell'intorno 3x3 di check
  */
@@ -17,20 +17,14 @@ static int is_nearby(unsigned int target_x, unsigned int target_y, unsigned int 
 static int is_in_grid(unsigned int x, unsigned int y);
 
 /*
- * Verifica il numero di mine nell'intorno 3x3 di x,y
- */
-static int mines_nearby(int board[][GAME_COLS], unsigned int x, unsigned int y);
-
-/*
  * Verifica il numero di flags nell'intorno 3x3 di x,y
  */
 static int flags_nearby(int board[][GAME_COLS], unsigned int x, unsigned int y);
 
 /*
- * Rivela le caselle nell'intorno 3x3 di x,y
- * Se exit_on_mine è vero, la funzione ritorna -1 se è presente una mina
+ * Rivela le caselle nell'intorno 3x3 di x,y e ritorna -1 se è presente una mina
  */
-static int display_around(int board[][GAME_COLS], unsigned int x, unsigned int y, int exit_on_mine);
+static int display_around(int board[][GAME_COLS], unsigned int x, unsigned int y);
 
 /*
  * Fills the rows*cols board with num_mines random mines
@@ -49,7 +43,7 @@ void random_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, 
 
     /* Vengono generate le mine */
     unsigned int mine_index;
-    for(mine_index = 0; mine_index < num_mines; mine_index++) {
+    for (mine_index = 0; mine_index < num_mines; mine_index++) {
         unsigned int mine_x, mine_y;
         /* Vengono generate le coordinate da 0 a <grandezza griglia> */
         do {
@@ -92,17 +86,17 @@ int flag_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, uns
 * displayed cells or -1 if i,j contains a mine.
 */
 int display_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, unsigned int i, unsigned int j) {
-    int cell_val, end_y, end_x, start_y, start_x, ret_val, n_mines,x, y;
+    int cell_val, end_y, end_x, start_y, start_x, ret_val, n_mines, x, y;
     start_x = HANDLE_START(i);
     start_y = HANDLE_START(j);
     end_x = HANDLE_END(i, cols);
     end_y = HANDLE_END(j, rows);
     cell_val = board[i][j];
-    if (cell_val == UNKN_FREE){
+    if (cell_val == UNKN_FREE) {
         n_mines = 0;
         for (x = start_x; x <= end_x; x++) {
-            for (y = start_y; y <= end_y; y++){
-                if (board[x][y] == UNKN_MINE || board[x][y] == FLAG_MINE) 
+            for (y = start_y; y <= end_y; y++) {
+                if (board[x][y] == UNKN_MINE || board[x][y] == FLAG_MINE)
                     n_mines++;
             }
         }
@@ -110,21 +104,19 @@ int display_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, 
         ret_val = 1;
         if (!n_mines) {
             for (x = start_x; x <= end_x; x++) {
-                for (y = start_y; y <= end_y; y++){
-                    if (x != i || y!= j) {
+                for (y = start_y; y <= end_y; y++) {
+                    if (x != i || y != j) {
                         cell_val = display_board(board, rows, cols, x, y);
                         ret_val += cell_val;
                     }
                 }
             }
         }
-    }
-    else {
-        if (cell_val == UNKN_MINE){
+    } else {
+        if (cell_val == UNKN_MINE) {
             board[i][j] = MINE;
             ret_val = -1;
-        }
-        else {
+        } else {
             ret_val = 0;
         }
     }
@@ -140,7 +132,7 @@ int display_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, 
  */
 int expand_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, unsigned int i, unsigned int j) {
     if(board[i][j] > C8 || board[i][j] != flags_nearby(board, i, j)) return 0;
-    return display_around(board, i, j, 1);
+    return display_around(board, i, j);
 }
 
 static int is_nearby(unsigned int target_x, unsigned int target_y, unsigned int check_x, unsigned int check_y) {
@@ -151,40 +143,27 @@ static int is_in_grid(unsigned int x, unsigned int y) {
     return x >= 0 && x < GAME_COLS && y >= 0 && y < GAME_ROWS;
 }
 
-static int mines_nearby(int board[][GAME_COLS], unsigned int x, unsigned int y) {
-    int mines = 0;
-    unsigned int i, j;
-    for(j = y == 0 ? y : y - 1; j <= y + 1; j++) {
-        for(i = x == 0 ? x : x - 1; i <= x + 1; i++) {
-            if(is_in_grid(i, j)) {
-                if(board[i][j] == UNKN_MINE || board[i][j] == MINE || board[i][j] == FLAG_MINE) mines++;
-            }
-        }
-    }
-    return mines;
-}
-
 static int flags_nearby(int board[][GAME_COLS], unsigned int x, unsigned int y) {
     int flags = 0;
     unsigned int i, j;
-    for(j = y == 0 ? y : y - 1; j <= y + 1; j++) {
-        for(i = x == 0 ? x : x - 1; i <= x + 1; i++) {
-            if(is_in_grid(i, j)) {
-                if(board[i][j] == FLAG || board[i][j] == FLAG_MINE || board[i][j] == FLAG_FREE) flags++;
+    for (j = y == 0 ? y : y - 1; j <= y + 1; j++) {
+        for (i = x == 0 ? x : x - 1; i <= x + 1; i++) {
+            if (is_in_grid(i, j)) {
+                if (board[i][j] == FLAG || board[i][j] == FLAG_MINE || board[i][j] == FLAG_FREE) flags++;
             }
         }
     }
     return flags;
 }
 
-static int display_around(int board[][GAME_COLS], unsigned int x, unsigned int y, int exit_on_mine) {
+static int display_around(int board[][GAME_COLS], unsigned int x, unsigned int y) {
     int count = 0; /* Posizioni svelate */
     unsigned int i, j;
-    for(j = y == 0 ? y : y - 1; j <= y + 1; j++) {
-        for(i = x == 0 ? x : x - 1; i <= x + 1; i++) {
-            if(is_in_grid(i, j))
-                if(board[i][j] != FLAG_FREE && board[i][j] != FLAG_MINE) {
-                    if(exit_on_mine && board[i][j] == UNKN_MINE) return -1;
+    for (j = y == 0 ? y : y - 1; j <= y + 1; j++) {
+        for (i = x == 0 ? x : x - 1; i <= x + 1; i++) {
+            if (is_in_grid(i, j))
+                if (board[i][j] != FLAG_FREE && board[i][j] != FLAG_MINE) {
+                    if (board[i][j] == UNKN_MINE) return -1;
                     count += display_board(board, GAME_ROWS, GAME_COLS, i, j);
                 }
         }
