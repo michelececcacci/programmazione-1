@@ -92,16 +92,16 @@ int flag_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, uns
 * displayed cells or -1 if i,j contains a mine.
 */
 int display_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, unsigned int i, unsigned int j) {
-    int y_end, x_end, y_start, x_start, n_mines, ret_val, x, y, cell_val;
-    x_start = HANDLE_START(i);
-    y_start = HANDLE_START(j);
-    x_end = HANDLE_END(i, cols);
-    y_end = HANDLE_END(j, rows);
+    int cell_val, end_y, end_x, start_y, start_x, ret_val, n_mines,x, y;
+    start_x = HANDLE_START(i);
+    start_y = HANDLE_START(j);
+    end_x = HANDLE_END(i, cols);
+    end_y = HANDLE_END(j, rows);
     cell_val = board[i][j];
     if (cell_val == UNKN_FREE){
         n_mines = 0;
-        for (x = x_start; x <= x_end; x++) {
-            for (y = y_start; y <= y_end; y++){
+        for (x = start_x; x <= end_x; x++) {
+            for (y = start_y; y <= end_y; y++){
                 if (board[x][y] == UNKN_MINE || board[x][y] == FLAG_MINE) 
                     n_mines++;
             }
@@ -109,8 +109,8 @@ int display_board(int board[][GAME_COLS], unsigned int rows, unsigned int cols, 
         board[i][j] = n_mines;
         ret_val = 1;
         if (!n_mines) {
-            for (x = x_start; x <= x_end; x++) {
-                for (y = y_start; y <= y_end; y++){
+            for (x = start_x; x <= end_x; x++) {
+                for (y = start_y; y <= end_y; y++){
                     if (x != i || y!= j) {
                         cell_val = display_board(board, rows, cols, x, y);
                         ret_val += cell_val;
