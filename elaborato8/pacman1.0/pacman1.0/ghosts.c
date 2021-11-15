@@ -1,7 +1,6 @@
 #define GHOSTS_STUD
 #ifdef GHOSTS_STUD
 
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -9,11 +8,30 @@
 #include "pacman.h"
 #include "matrix.h"
 
+typedef struct ghost {
+    unsigned int id;
+    int status;
+    struct position pos;
+} ghost;
+
+struct ghosts {
+    unsigned int num_ghosts;
+    ghost ghosts[];
+};
 
 /* Create the ghosts data structure */
 struct ghosts *ghosts_setup(unsigned int num_ghosts) {
-    struct ghosts *g=NULL; 
-    return g;
+    struct ghosts *ghosts = malloc(sizeof(struct ghosts) + sizeof(ghost) * num_ghosts);
+    ghosts->num_ghosts = num_ghosts;
+
+    unsigned int i;
+    for (i = 0; i < num_ghosts; i++) {
+        struct position pos = {0, 0};
+        ghost ghost = { i, NORMAL, pos};
+        ghosts->ghosts[i] = ghost;
+    }
+
+    return ghosts;
 }
 
 /* Destroy the ghost data structure */
