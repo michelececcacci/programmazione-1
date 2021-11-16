@@ -33,7 +33,6 @@ struct ghosts {
     ghost ghosts[];
 };
 
-static struct position convert_direction(char c);
 static ghost *by_id(struct ghosts *G, unsigned int id);
 
 static int can_move_hor(struct arena arena, ghost *ghost, int direction);
@@ -93,20 +92,37 @@ enum ghost_status ghosts_get_status(struct ghosts *G, unsigned int id) {
 
 /* Move the ghost id (according to its status). Returns the new position */
 struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id) {
+    int dir_x, dir_y, i;
     ghost *ghost = by_id(G, id);
     /* test **/
-    /*if(can_move_hor(G->arena, ghost, RIGHT)) ghost->pos.i++;  */
-    /* if(can_move_vert(G->arena, ghost, DOWN)) ghost->pos.j++; */
+    if(can_move_hor(G->arena, ghost, RIGHT)) ghost->pos.i += RIGHT;  
+    if(can_move_vert(G->arena, ghost, UP)) ghost->pos.j += UP;
 
     if (ghost->status == NORMAL) {
+        /* should try to find the move that brings the ghost closest to pacman */
     }
     else if (ghost->status == SCARED_NORMAL || ghost->status == SCARED_BLINKING) {
+        /* same thing as before, but should bring further */
 
     }
     else if (ghost->status == EYES) {
-        struct position home_pos = convert_direction(G->arena.matrix[ghost->pos.i][ghost->pos.j]);
-        ghost->pos.i += home_pos.i;
-        ghost->pos.j += home_pos.j;
+        /* seems to work decently even though it's not pretty at all. Edge case handling not needed*/
+        char c =  G->arena.matrix[ghost->pos.j][ghost->pos.i]; 
+            switch (c) {
+        case UP_SYM:
+            ghost->pos.j += UP;
+            break;
+        case DOWN_SYM:
+            ghost->pos.j += DOWN;
+            break;
+        case LEFT_SYM:
+            ghost->pos.i += LEFT;
+            break;
+        case RIGHT_SYM:
+            ghost->pos.i += RIGHT;
+            break;
+    }
+
         /* 
         FILE *fp;
         fp = fopen("eyes.log", "a");
@@ -133,30 +149,12 @@ static int can_move_vert(struct arena arena, ghost *ghost, int direction) {
 }
 
 
+
 static float  distance(struct position pos1, struct position pos2){
     float distance_x =  (pos1.i - pos2.i) * (pos1.i - pos2. i);
     float distance_y  = (pos1.j - pos2.j) * (pos1.j - pos2.j);
     return sqrt(distance_x + distance_y);
 
-}
-
-static struct position convert_direction(char c){
-    struct position path_pos;
-    switch (c) {
-        case UP_SYM:
-            path_pos.i = UP;
-            break;
-        case DOWN_SYM:
-            path_pos.i = DOWN;
-            break;
-        case LEFT_SYM:
-            path_pos.j = LEFT;
-            break;
-        case RIGHT_SYM:
-            path_pos.j = RIGHT;
-            break;
-    }
-    return path_pos;
 }
 
 #endif
