@@ -1,3 +1,4 @@
+#include "global.h"
 #define GHOSTS_STUD
 #ifdef GHOSTS_STUD
 
@@ -7,6 +8,7 @@
 #include "ghosts.h"
 #include "pacman.h"
 #include "matrix.h"
+#include "math.h"
 
 #define UP   -1
 #define DOWN  1
@@ -120,6 +122,33 @@ static int can_move_hor(struct arena arena, ghost *ghost, int direction) {
 
 static int can_move_vert(struct arena arena, ghost *ghost, int direction) {
     return arena.matrix[ghost->pos.i][ghost->pos.j + direction] == XWALL_SYM;
+}
+
+
+static float  distance(struct position pos1, struct position pos2){
+    float distance_x =  (pos1.i - pos2.i) * (pos1.i - pos2. i);
+    float distance_y  = (pos1.j - pos2.j) * (pos1.j - pos2.j);
+    return sqrt(distance_x + distance_y);
+
+}
+
+static struct position convert_direction(char c){
+    struct position path_pos;
+    switch (c) {
+        case UP_SYM:
+            path_pos.i = UP;
+            break;
+        case DOWN_SYM:
+            path_pos.i = DOWN;
+            break;
+        case LEFT_SYM:
+            path_pos.j = LEFT;
+            break;
+        case RIGHT_SYM:
+            path_pos.j = RIGHT;
+            break;
+    }
+    return path_pos;
 }
 
 #endif
