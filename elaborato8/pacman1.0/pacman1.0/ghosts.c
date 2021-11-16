@@ -8,6 +8,11 @@
 #include "pacman.h"
 #include "matrix.h"
 
+#define UP   -1
+#define DOWN  1
+#define LEFT -1
+#define RIGHT 1
+
 typedef struct ghost {
     unsigned int id;
     int status;
@@ -16,10 +21,16 @@ typedef struct ghost {
 
 struct ghosts {
     unsigned int num_ghosts;
+    char **arena;
+    unsigned int rows;
+    unsigned int columns;
     ghost ghosts[];
 };
 
 static ghost *by_id(struct ghosts *G, unsigned int id);
+
+static int can_move_hor(ghost *ghost, int direction);
+static int can_move_vert(ghost *ghost, int direction);
 
 /* Create the ghosts data structure */
 struct ghosts *ghosts_setup(unsigned int num_ghosts) {
@@ -44,7 +55,9 @@ void ghosts_destroy(struct ghosts *G) {
 /* Set the arena (A) matrix */
 void ghosts_set_arena(struct ghosts *G, char **A, unsigned int nrow, 
                                                       unsigned int ncol) {
-    return;                                                      
+    G->arena = A;
+    G->rows = nrow;
+    G->columns = ncol;
 }
 
 /* Set the position of the ghost id. */
@@ -74,8 +87,16 @@ enum ghost_status ghosts_get_status(struct ghosts *G, unsigned int id) {
 
 /* Move the ghost id (according to its status). Returns the new position */
 struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id) {
-    struct position p; 
-    return p;
+    ghost *ghost = by_id(G, id);
+    switch (ghost->status) {
+        case NORMAL:
+            break;
+        case SCARED_NORMAL:
+        case SCARED_BLINKING:
+            break;
+        case EYES:
+            break;
+    }
 }
 
 static ghost *by_id(struct ghosts *G, unsigned int id) {
@@ -84,6 +105,14 @@ static ghost *by_id(struct ghosts *G, unsigned int id) {
         if(G->ghosts[i].id == id) return &G->ghosts[i];
     }
     return NULL;
+}
+
+static int can_move_hor(ghost *ghost, int direction) {
+    return 0;
+}
+
+static int can_move_vert(ghost *ghost, int direction) {
+    return 0;
 }
 
 #endif
