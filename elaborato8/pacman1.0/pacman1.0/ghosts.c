@@ -2,6 +2,7 @@
 
 #define GHOSTS_STUD
 #ifdef GHOSTS_STUD
+#define LOGGING
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -132,6 +133,12 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
         ghost->pos.i += ghost->dir.i;
         ghost->pos.j += ghost->dir.j;
         /* should try to find the move that brings the ghost closest to pacman */
+        #ifdef LOGGING
+        FILE *fp;
+        fp = fopen("normal.log", "a");
+        fprintf(fp, "Position x: %d, position y: %d, ghost id: %d\n", ghost->pos.i, ghost->pos.j, ghost->id);
+        fclose(fp);
+        #endif
     } else if (ghost->status == SCARED_NORMAL || ghost->status == SCARED_BLINKING) {
         /* same thing as before, but should bring further */
 
@@ -152,13 +159,12 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
                 ghost->pos.i += RIGHT;
                 break;
         }
-
-        /* 
+        #ifdef LOGGING
         FILE *fp;
         fp = fopen("eyes.log", "a");
-        fprintf(fp, "Position x: %d, position y: %d\n", ghost->pos.i, ghost->pos.j);
+        fprintf(fp, "Position x: %d, position y: %d, ghost id: %d\n", ghost->pos.i, ghost->pos.j, ghost->id);
         fclose(fp);
-        */
+        #endif
     }
 }
 
