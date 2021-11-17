@@ -205,8 +205,8 @@ static struct position closest_direction(struct ghosts *G, struct pacman *P, gho
 
     struct position new = { ghost_pos.i, ghost_pos.j };
 
-    double dis_x = 0;
-    double dis_y = 0;
+    double dis_x = -1;
+    double dis_y = -1;
 
     int dir_x = 0;
     int dir_y = 0;
@@ -219,8 +219,8 @@ static struct position closest_direction(struct ghosts *G, struct pacman *P, gho
     }
     if(can_move_offs(G, ghost, RIGHT, 0) && ghost_dir.i != RIGHT) {
         new.i += RIGHT;
-        float right_distance = distance(pacman_pos, new);
-        if(dis_x > right_distance) {
+        double right_distance = distance(pacman_pos, new);
+        if(dis_x < 0 || dis_x > right_distance) {
             dis_x = right_distance;
             dir_x = RIGHT;
         }
@@ -234,8 +234,8 @@ static struct position closest_direction(struct ghosts *G, struct pacman *P, gho
     }
     if(can_move_offs(G, ghost, 0, DOWN) && ghost_dir.j != DOWN) {
         new.j += DOWN;
-        float down_distance = distance(pacman_pos, new);
-        if(dis_y > down_distance) {
+        double down_distance = distance(pacman_pos, new);
+        if(dis_y < 0 || dis_y > down_distance) {
             dis_y = down_distance;
             dir_y = DOWN;
         }
