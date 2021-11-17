@@ -202,6 +202,7 @@ static struct position closest_direction(struct ghosts *G, struct pacman *P, gho
     struct position ghost_pos = ghost->pos;
     struct position ghost_dir = ghost->dir;
 
+    /* Posizione clonata */
     struct position new = { ghost_pos.i, ghost_pos.j };
 
     double dis_x = -1;
@@ -210,13 +211,18 @@ static struct position closest_direction(struct ghosts *G, struct pacman *P, gho
     int dir_x = 0;
     int dir_y = 0;
 
-    if(can_move_offs(G, ghost, LEFT, 0) && ghost_dir.i != LEFT) {
+    /*
+     * !ghost_dir.i/j permette di alternare movimenti verticali ad orizzontali
+     * per evitare situazioni di stallo.
+     */
+
+    if(can_move_offs(G, ghost, LEFT, 0) && !ghost_dir.i) {
         new.i += LEFT;
         dis_x = distance(pacman_pos, new);
         dir_x = LEFT;
         new.i -= LEFT;
     }
-    if(can_move_offs(G, ghost, RIGHT, 0) && ghost_dir.i != RIGHT) {
+    if(can_move_offs(G, ghost, RIGHT, 0) && !ghost_dir.i) {
         new.i += RIGHT;
         double right_distance = distance(pacman_pos, new);
         if(dis_x < 0 || dis_x > right_distance) {
@@ -225,13 +231,13 @@ static struct position closest_direction(struct ghosts *G, struct pacman *P, gho
         }
         new.i -= RIGHT;
     }
-    if(can_move_offs(G, ghost, 0, UP) && ghost_dir.j != UP) {
+    if(can_move_offs(G, ghost, 0, UP) && !ghost_dir.j) {
         new.j += UP;
         dis_y = distance(pacman_pos, new);
         dir_y = UP;
         new.j -= UP;
     }
-    if(can_move_offs(G, ghost, 0, DOWN) && ghost_dir.j != DOWN) {
+    if(can_move_offs(G, ghost, 0, DOWN) && !ghost_dir.j) {
         new.j += DOWN;
         double down_distance = distance(pacman_pos, new);
         if(dis_y < 0 || dis_y > down_distance) {
