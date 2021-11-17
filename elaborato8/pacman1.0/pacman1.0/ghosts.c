@@ -145,11 +145,12 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
 }
 
 static ghost *by_id(struct ghosts *G, unsigned int id) {
-    unsigned int i;
+    /*unsigned int i;
     for (i = 0; i < G->num_ghosts; i++) {
         if (G->ghosts[i].id == id) return &G->ghosts[i];
     }
-    return NULL;
+    return NULL;*/
+    return &G->ghosts[id];
 }
 
 static int can_move_hor(struct arena arena, ghost *ghost, int direction) {
