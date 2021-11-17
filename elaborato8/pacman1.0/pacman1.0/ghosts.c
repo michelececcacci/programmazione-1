@@ -38,18 +38,34 @@ struct ghosts {
     ghost ghosts[];
 };
 
+/*
+ * Ottiene un fantasma da un ID.
+ */
 static ghost *by_id(struct ghosts *G, unsigned int id);
 
+/*
+ * Controlla se una posizione è libera da muri o fantasmi.
+ */
 static int is_free(struct position pos, struct ghosts *G);
 
-static int can_move_hor(struct ghosts *G, ghost *ghost, int direction);
+/*
+ * Controlla se il fantasma può muoversi dalla sua posizione verso un determinato offset.
+ */
+static int can_move_offs(struct ghosts *G, ghost *ghost, int offsetX, int offsetY);
 
-static int can_move_vert(struct ghosts *G, ghost *ghost, int direction);
+/*
+ * Controlla se il fantasma può muoversi dalla sua posizione verso la sua direzione.
+ */
+static int can_move_dir(struct ghosts *G, ghost *ghost);
 
-static int can_move(struct ghosts *G, ghost *ghost);
+/*
+ * Calcola la distanza tra due posizioni.
+ */
+static double distance(struct position pos1, struct position pos2);
 
-static float distance(struct position pos1, struct position pos2);
-
+/*
+ * Trova la possibile direzione più vicina verso pacman.
+ */
 static struct position closest_direction(struct ghosts *G, struct pacman *P, ghost *ghost);
 
 /* Create the ghosts data structure */
@@ -110,7 +126,7 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
     ghost *ghost = by_id(G, id);
 
     if (ghost->status == NORMAL) {
-        if((!ghost->dir.i && !ghost->dir.j) || !can_move(G, ghost)) {
+        if((!ghost->dir.i && !ghost->dir.j) || !can_move_dir(G, ghost)) {
             ghost->dir = closest_direction(G, P, ghost);
         }
         ghost->pos.i += ghost->dir.i;
@@ -155,17 +171,12 @@ static ghost *by_id(struct ghosts *G, unsigned int id) {
     return &G->ghosts[id];
 }
 
-static int can_move_hor(struct ghosts *G, ghost *ghost, int direction) {
-    struct position pos = {ghost->pos.i + direction, ghost->pos.j};
+static int can_move_offs(struct ghosts *G, ghost *ghost, int offsetX, int offsetY) {
+    struct position pos = {ghost->pos.i + offsetX, ghost->pos.j + offsetY};
     return is_free(pos, G);
 }
 
-static int can_move_vert(struct ghosts *G, ghost *ghost, int direction) {
-    struct position pos = {ghost->pos.i, ghost->pos.j + direction};
-    return is_free(pos, G);
-}
-
-static int can_move(struct ghosts *G, ghost *ghost) {
+static int can_move_dir(struct ghosts *G, ghost *ghost) {
     struct position pos = {ghost->pos.i + ghost->dir.i, ghost->pos.j + ghost->dir.j};
     return is_free(pos, G);
 }
@@ -181,9 +192,9 @@ static int is_free(struct position pos, struct ghosts *G) {
     return 1;
 }
 
-static float distance(struct position pos1, struct position pos2) {
-    float distance_x = (float) ((pos1.i - pos2.i) * (pos1.i - pos2.i));
-    float distance_y = (float) ((pos1.j - pos2.j) * (pos1.j - pos2.j));
+static double distance(struct position pos1, struct position pos2) {
+    unsigned int distance_x = (pos1.i - pos2.i) * (pos1.i - pos2.i);
+    unsigned int distance_y = (pos1.j - pos2.j) * (pos1.j - pos2.j);
     return sqrt(distance_x + distance_y);
 }
 
@@ -194,19 +205,19 @@ static struct position closest_direction(struct ghosts *G, struct pacman *P, gho
 
     struct position new = { ghost_pos.i, ghost_pos.j };
 
-    float dis_x = 0;
-    float dis_y = 0;
+    double dis_x = 0;
+    double dis_y = 0;
 
     int dir_x = 0;
     int dir_y = 0;
 
-    if(can_move_hor(G, ghost, LEFT) && ghost_dir.i != LEFT) {
+    if(can_move_offs(G, ghost, LEFT, 0) && ghost_dir.i != LEFT) {
         new.i += LEFT;
         dis_x = distance(pacman_pos, new);
         dir_x = LEFT;
         new.i -= LEFT;
     }
-    if(can_move_hor(G, ghost, RIGHT) && ghost_dir.i != RIGHT) {
+    if(can_move_offs(G, ghost, RIGHT, 0) && ghost_dir.i != RIGHT) {
         new.i += RIGHT;
         float right_distance = distance(pacman_pos, new);
         if(dis_x > right_distance) {
@@ -215,13 +226,13 @@ static struct position closest_direction(struct ghosts *G, struct pacman *P, gho
         }
         new.i -= RIGHT;
     }
-    if(can_move_vert(G, ghost, UP) && ghost_dir.j != UP) {
+    if(can_move_offs(G, ghost, 0, UP) && ghost_dir.j != UP) {
         new.j += UP;
         dis_y = distance(pacman_pos, new);
         dir_y = UP;
         new.j -= UP;
     }
-    if(can_move_vert(G, ghost, DOWN) && ghost_dir.j != DOWN) {
+    if(can_move_offs(G, ghost, 0, DOWN) && ghost_dir.j != DOWN) {
         new.j += DOWN;
         float down_distance = distance(pacman_pos, new);
         if(dis_y > down_distance) {
