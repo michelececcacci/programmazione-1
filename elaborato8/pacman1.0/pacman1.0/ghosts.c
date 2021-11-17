@@ -51,7 +51,7 @@ static int is_free(struct position pos, struct ghosts *G);
 /*
  * Controlla se il fantasma può muoversi dalla sua posizione verso un determinato offset.
  */
-static int can_move_offs(struct ghosts *G, ghost *ghost, int offsetX, int offsetY);
+static int can_move_offs(struct ghosts *G, ghost *ghost, unsigned int offsetX, unsigned int offsetY);
 
 /*
  * Controlla se il fantasma può muoversi dalla sua posizione verso la sua direzione.
@@ -171,14 +171,13 @@ static ghost *by_id(struct ghosts *G, unsigned int id) {
     return &G->ghosts[id];
 }
 
-static int can_move_offs(struct ghosts *G, ghost *ghost, int offsetX, int offsetY) {
+static int can_move_offs(struct ghosts *G, ghost *ghost, unsigned int offsetX, unsigned int offsetY) {
     struct position pos = {ghost->pos.i + offsetX, ghost->pos.j + offsetY};
     return is_free(pos, G);
 }
 
 static int can_move_dir(struct ghosts *G, ghost *ghost) {
-    struct position pos = {ghost->pos.i + ghost->dir.i, ghost->pos.j + ghost->dir.j};
-    return is_free(pos, G);
+    return can_move_offs(G, ghost, ghost->dir.i, ghost->dir.j);
 }
 
 static int is_free(struct position pos, struct ghosts *G) {
@@ -242,7 +241,7 @@ static struct position closest_direction(struct ghosts *G, struct pacman *P, gho
         new.j += DOWN;
     }
 
-    struct position direction = { dir_x, dir_y };
+    struct position direction = { dis_x >= dis_y ? dir_x : 0, dis_y > dis_x ? dir_y : 0 };
     return direction;
 }
 
