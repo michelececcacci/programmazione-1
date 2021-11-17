@@ -40,15 +40,17 @@ struct ghosts {
 
 static ghost *by_id(struct ghosts *G, unsigned int id);
 
-static int can_move_hor(struct arena arena, ghost *ghost, int direction);
+static int is_free(struct position pos, struct ghosts *G);
 
-static int can_move_vert(struct arena arena, ghost *ghost, int direction);
+static int can_move_hor(struct ghosts *G, ghost *ghost, int direction);
 
-static int can_move(struct arena arena, ghost *ghost);
+static int can_move_vert(struct ghosts *G, ghost *ghost, int direction);
+
+static int can_move(struct ghosts *G, ghost *ghost);
 
 static float distance(struct position pos1, struct position pos2);
 
-static struct position closest_direction(struct arena arena, struct pacman *P, ghost *ghost);
+static struct position closest_direction(struct ghosts *G, struct pacman *P, ghost *ghost);
 
 /* Create the ghosts data structure */
 struct ghosts *ghosts_setup(unsigned int num_ghosts) {
@@ -108,8 +110,8 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
     ghost *ghost = by_id(G, id);
 
     if (ghost->status == NORMAL) {
-        if((!ghost->dir.i && !ghost->dir.j) || !can_move(G->arena, ghost)) {
-            ghost->dir = closest_direction(G->arena, P, ghost);
+        if((!ghost->dir.i && !ghost->dir.j) || !can_move(G, ghost)) {
+            ghost->dir = closest_direction(G, P, ghost);
         }
         ghost->pos.i += ghost->dir.i;
         ghost->pos.j += ghost->dir.j;
@@ -153,16 +155,30 @@ static ghost *by_id(struct ghosts *G, unsigned int id) {
     return &G->ghosts[id];
 }
 
-static int can_move_hor(struct arena arena, ghost *ghost, int direction) {
-    return arena.matrix[ghost->pos.i + direction][ghost->pos.j] != XWALL_SYM;
+static int can_move_hor(struct ghosts *G, ghost *ghost, int direction) {
+    struct position pos = {ghost->pos.i + direction, ghost->pos.j};
+    return is_free(pos, G);
 }
 
-static int can_move_vert(struct arena arena, ghost *ghost, int direction) {
-    return arena.matrix[ghost->pos.i][ghost->pos.j + direction] != XWALL_SYM;
+static int can_move_vert(struct ghosts *G, ghost *ghost, int direction) {
+    struct position pos = {ghost->pos.i, ghost->pos.j + direction};
+    return is_free(pos, G);
 }
 
-static int can_move(struct arena arena, ghost *ghost) {
-    return arena.matrix[ghost->pos.i + ghost->dir.i][ghost->pos.j + ghost->dir.j] != XWALL_SYM;
+static int can_move(struct ghosts *G, ghost *ghost) {
+    struct position pos = {ghost->pos.i + ghost->dir.i, ghost->pos.j + ghost->dir.j};
+    return is_free(pos, G);
+}
+
+static int is_free(struct position pos, struct ghosts *G) {
+    if(G->arena.matrix[pos.i][pos.j] == XWALL_SYM) return 0;
+
+    unsigned int i;
+    for (i = 0; i < G->num_ghosts; i++) {
+        ghost ghost = G->ghosts[i];
+        if (ghost.pos.i == pos.i && ghost.pos.j == pos.j) return 0;
+    }
+    return 1;
 }
 
 static float distance(struct position pos1, struct position pos2) {
@@ -171,7 +187,7 @@ static float distance(struct position pos1, struct position pos2) {
     return sqrt(distance_x + distance_y);
 }
 
-static struct position closest_direction(struct arena arena, struct pacman *P, ghost *ghost) {
+static struct position closest_direction(struct ghosts *G, struct pacman *P, ghost *ghost) {
     struct position pacman_pos = pacman_get_position(P);
     struct position ghost_pos = ghost->pos;
     struct position ghost_dir = ghost->dir;
@@ -184,13 +200,13 @@ static struct position closest_direction(struct arena arena, struct pacman *P, g
     int dir_x = 0;
     int dir_y = 0;
 
-    if(can_move_hor(arena, ghost, LEFT) && ghost_dir.i != LEFT) {
+    if(can_move_hor(G, ghost, LEFT) && ghost_dir.i != LEFT) {
         new.i += LEFT;
         dis_x = distance(pacman_pos, new);
         dir_x = LEFT;
         new.i -= LEFT;
     }
-    if(can_move_hor(arena, ghost, RIGHT) && ghost_dir.i != RIGHT) {
+    if(can_move_hor(G, ghost, RIGHT) && ghost_dir.i != RIGHT) {
         new.i += RIGHT;
         float right_distance = distance(pacman_pos, new);
         if(dis_x > right_distance) {
@@ -199,13 +215,13 @@ static struct position closest_direction(struct arena arena, struct pacman *P, g
         }
         new.i -= RIGHT;
     }
-    if(can_move_vert(arena, ghost, UP) && ghost_dir.j != UP) {
+    if(can_move_vert(G, ghost, UP) && ghost_dir.j != UP) {
         new.j += UP;
         dis_y = distance(pacman_pos, new);
         dir_y = UP;
         new.j -= UP;
     }
-    if(can_move_vert(arena, ghost, DOWN) && ghost_dir.j != DOWN) {
+    if(can_move_vert(G, ghost, DOWN) && ghost_dir.j != DOWN) {
         new.j += DOWN;
         float down_distance = distance(pacman_pos, new);
         if(dis_y > down_distance) {
