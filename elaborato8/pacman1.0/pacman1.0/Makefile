@@ -21,7 +21,8 @@ display.o: global.h display.h display.c
 	gcc $(CFLAG) -c display.c
 
 pacman: queue.o matrix.o arena.o pacman.o ghosts.o display.o main.c
-	gcc $(CFLAG) -lm  queue.o matrix.o arena.o ghosts.o display.o pacman.o main.c -o pacman  -lncurses
+	gcc $(CFLAG)   queue.o matrix.o arena.o ghosts.o display.o pacman.o main.c -o pacman  -lncurses -lm 
 
 clean:
-	rm -rf *.o pacman
+	rm -rf *.o pacman \
+	rm *.log
