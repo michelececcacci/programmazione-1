@@ -23,6 +23,7 @@ typedef struct ghost {
     unsigned int id;
     int status;
     struct position pos;
+    struct position dir;
 } ghost;
 
 struct arena {
@@ -43,6 +44,8 @@ static int can_move_hor(struct arena arena, ghost *ghost, int direction);
 
 static int can_move_vert(struct arena arena, ghost *ghost, int direction);
 
+static int can_move(struct arena arena, ghost *ghost);
+
 static float distance(struct position pos1, struct position pos2);
 
 static struct position closest_direction(struct arena arena, struct pacman *P, ghost *ghost);
@@ -55,7 +58,8 @@ struct ghosts *ghosts_setup(unsigned int num_ghosts) {
     unsigned int i;
     for (i = 0; i < num_ghosts; i++) {
         struct position pos = {0, 0};
-        ghost ghost = {i, NORMAL, pos};
+        struct position dir = {0, 0};
+        ghost ghost = {i, NORMAL, pos, dir};
         ghosts->ghosts[i] = ghost;
     }
 
@@ -104,9 +108,11 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
     ghost *ghost = by_id(G, id);
 
     if (ghost->status == NORMAL) {
-        struct position direction = closest_direction(G->arena, P, ghost);
-        ghost->pos.i += direction.i;
-        ghost->pos.j += direction.j;
+        if((!ghost->dir.i && !ghost->dir.j) || !can_move(G->arena, ghost)) {
+            ghost->dir = closest_direction(G->arena, P, ghost);
+        }
+        ghost->pos.i += ghost->dir.i;
+        ghost->pos.j += ghost->dir.j;
         /* should try to find the move that brings the ghost closest to pacman */
     } else if (ghost->status == SCARED_NORMAL || ghost->status == SCARED_BLINKING) {
         /* same thing as before, but should bring further */
@@ -147,22 +153,27 @@ static ghost *by_id(struct ghosts *G, unsigned int id) {
 }
 
 static int can_move_hor(struct arena arena, ghost *ghost, int direction) {
-    return arena.matrix[ghost->pos.i + direction][ghost->pos.j] == XWALL_SYM;
+    return arena.matrix[ghost->pos.i + direction][ghost->pos.j] != XWALL_SYM;
 }
 
 static int can_move_vert(struct arena arena, ghost *ghost, int direction) {
-    return arena.matrix[ghost->pos.i][ghost->pos.j + direction] == XWALL_SYM;
+    return arena.matrix[ghost->pos.i][ghost->pos.j + direction] != XWALL_SYM;
+}
+
+static int can_move(struct arena arena, ghost *ghost) {
+    return arena.matrix[ghost->pos.i + ghost->dir.i][ghost->pos.j + ghost->dir.j] != XWALL_SYM;
 }
 
 static float distance(struct position pos1, struct position pos2) {
     float distance_x = (float) ((pos1.i - pos2.i) * (pos1.i - pos2.i));
     float distance_y = (float) ((pos1.j - pos2.j) * (pos1.j - pos2.j));
-    return sqrtf(distance_x + distance_y);
+    return sqrt(distance_x + distance_y);
 }
 
 static struct position closest_direction(struct arena arena, struct pacman *P, ghost *ghost) {
     struct position pacman_pos = pacman_get_position(P);
     struct position ghost_pos = ghost->pos;
+    struct position ghost_dir = ghost->dir;
 
     struct position new = { ghost_pos.i, ghost_pos.j };
 
@@ -172,13 +183,13 @@ static struct position closest_direction(struct arena arena, struct pacman *P, g
     int dir_x = 0;
     int dir_y = 0;
 
-    if(can_move_hor(arena, ghost, LEFT)) {
+    if(can_move_hor(arena, ghost, LEFT) && ghost_dir.i != LEFT) {
         new.i += LEFT;
         dis_x = distance(pacman_pos, new);
         dir_x = LEFT;
         new.i -= LEFT;
     }
-    if(can_move_hor(arena, ghost, RIGHT)) {
+    if(can_move_hor(arena, ghost, RIGHT) && ghost_dir.i != RIGHT) {
         new.i += RIGHT;
         float right_distance = distance(pacman_pos, new);
         if(dis_x > right_distance) {
@@ -187,13 +198,13 @@ static struct position closest_direction(struct arena arena, struct pacman *P, g
         }
         new.i -= RIGHT;
     }
-    if(can_move_vert(arena, ghost, UP)) {
+    if(can_move_vert(arena, ghost, UP) && ghost_dir.j != UP) {
         new.j += UP;
         dis_y = distance(pacman_pos, new);
         dir_y = UP;
         new.j -= UP;
     }
-    if(can_move_vert(arena, ghost, DOWN)) {
+    if(can_move_vert(arena, ghost, DOWN) && ghost_dir.j != DOWN) {
         new.j += DOWN;
         float down_distance = distance(pacman_pos, new);
         if(dis_y > down_distance) {
