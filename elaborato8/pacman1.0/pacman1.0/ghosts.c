@@ -75,9 +75,9 @@ static double distance(struct position pos1, struct position pos2);
 static int rand_bool();
 
 /*
- * Trova la possibile direzione più vicina verso pacman.
+ * Trova la possibile direzione più vicina verso pacman se closest == 1, altrimenti la direzione più lontana.
  */
-static struct position closest_direction(struct ghosts *G, struct pacman *P, ghost *ghost);
+static struct position relative_direction(struct ghosts *G, struct pacman *P, ghost *ghost, int closest);
 
 /* Create the ghosts data structure */
 struct ghosts *ghosts_setup(unsigned int num_ghosts) {
@@ -138,32 +138,7 @@ enum ghost_status ghosts_get_status(struct ghosts *G, unsigned int id) {
 struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id) {
     ghost *ghost = by_id(G, id);
 
-    if (ghost->status == NORMAL) {
-        if((!ghost->dir.i && !ghost->dir.j) || !can_move_dir(G, ghost)) {
-            ghost->dir = closest_direction(G, P, ghost);
-        } else if(rand_bool() && can_move_side(G, ghost)) {
-            /*
-             * La direzione può essere aggiornata se il fantasma si trova ad un "incrocio"
-             * per avere un movimento laterale (e non all'indietro)
-             */
-            struct position new_dir = closest_direction(G, P, ghost);
-            if(ghost->dir.i != -new_dir.i && ghost->dir.j != -new_dir.j) {
-                ghost->dir = new_dir;
-            }
-        }
-        ghost->pos.i += ghost->dir.i;
-        ghost->pos.j += ghost->dir.j;
-        /* should try to find the move that brings the ghost closest to pacman */
-        #ifdef LOGGING
-        FILE *fp;
-        fp = fopen("normal.log", "a");
-        fprintf(fp, "Position x: %d, position y: %d, ghost id: %d\n", ghost->pos.i, ghost->pos.j, ghost->id);
-        fclose(fp);
-        #endif
-    } else if (ghost->status == SCARED_NORMAL || ghost->status == SCARED_BLINKING) {
-        /* same thing as before, but should bring further */
-
-    } else if (ghost->status == EYES) {
+    if (ghost->status == EYES) {
         /* seems to work decently even though it's not pretty at all. Edge case handling not needed*/
         char c = G->arena.matrix[ghost->pos.i][ghost->pos.j];
         switch (c) {
@@ -186,7 +161,24 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
         fprintf(fp, "Position x: %d, position y: %d, ghost id: %d, closest position: %c\n", ghost->pos.i, ghost->pos.j, ghost->id, c);
         fclose(fp);
         #endif
+
+        return ghost->pos;
     }
+
+    if ((!ghost->dir.i && !ghost->dir.j) || !can_move_dir(G, ghost)
+        || (rand_bool() && can_move_side(G, ghost))) {
+        ghost->dir = relative_direction(G, P, ghost, ghost->status == NORMAL);
+    }
+
+    ghost->pos.i += ghost->dir.i;
+    ghost->pos.j += ghost->dir.j;
+
+    #ifdef LOGGING
+    FILE *fp;
+    fp = fopen("normal.log", "a");
+    fprintf(fp, "Position x: %d, position y: %d, ghost id: %d\n", ghost->pos.i, ghost->pos.j, ghost->id);
+    fclose(fp);
+    #endif
 }
 
 static ghost *by_id(struct ghosts *G, unsigned int id) {
@@ -227,7 +219,7 @@ static double distance(struct position pos1, struct position pos2) {
     return sqrt(distance_x + distance_y);
 }
 
-static struct position closest_direction(struct ghosts *G, struct pacman *P, ghost *ghost) {
+static struct position relative_direction(struct ghosts *G, struct pacman *P, ghost *ghost, int closest) {
     struct position pacman_pos = pacman_get_position(P);
     struct position ghost_pos = ghost->pos;
     struct position ghost_dir = ghost->dir;
@@ -255,7 +247,7 @@ static struct position closest_direction(struct ghosts *G, struct pacman *P, gho
     if(can_move_offs(G, ghost, RIGHT, 0) && !ghost_dir.i) {
         new.i += RIGHT;
         double right_distance = distance(pacman_pos, new);
-        if(dis_x < 0 || dis_x > right_distance) {
+        if(dis_x < 0 || dis_x > right_distance == closest) {
             dis_x = right_distance;
             dir_x = RIGHT;
         }
@@ -270,14 +262,14 @@ static struct position closest_direction(struct ghosts *G, struct pacman *P, gho
     if(can_move_offs(G, ghost, 0, DOWN) && !ghost_dir.j) {
         new.j += DOWN;
         double down_distance = distance(pacman_pos, new);
-        if(dis_y < 0 || dis_y > down_distance) {
+        if(dis_y < 0 || dis_y > down_distance == closest) {
             dis_y = down_distance;
             dir_y = DOWN;
         }
         new.j += DOWN;
     }
 
-    struct position direction = { dis_x >= dis_y ? dir_x : 0, dis_y > dis_x ? dir_y : 0 };
+    struct position direction = { dis_x >= dis_y == closest ? dir_x : 0, dis_y > dis_x == closest ? dir_y : 0 };
     return direction;
 }
 
