@@ -70,12 +70,19 @@ static int can_move_side(struct ghosts *G, ghost *ghost);
 static double distance(struct position pos1, struct position pos2);
 
 /*
+ * Una probabilità di poco inferiore al 50%.
+ */
+static int rand_bool();
+
+/*
  * Trova la possibile direzione più vicina verso pacman.
  */
 static struct position closest_direction(struct ghosts *G, struct pacman *P, ghost *ghost);
 
 /* Create the ghosts data structure */
 struct ghosts *ghosts_setup(unsigned int num_ghosts) {
+    srand(time(NULL));
+
     struct ghosts *ghosts = malloc(sizeof(struct ghosts) + sizeof(ghost) * num_ghosts);
     ghosts->num_ghosts = num_ghosts;
 
@@ -134,7 +141,7 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
     if (ghost->status == NORMAL) {
         if((!ghost->dir.i && !ghost->dir.j) || !can_move_dir(G, ghost)) {
             ghost->dir = closest_direction(G, P, ghost);
-        } else if(can_move_side(G, ghost)) {
+        } else if(rand_bool() && can_move_side(G, ghost)) {
             /*
              * La direzione può essere aggiornata se il fantasma si trova ad un "incrocio"
              * per avere un movimento laterale (e non all'indietro)
@@ -272,6 +279,10 @@ static struct position closest_direction(struct ghosts *G, struct pacman *P, gho
 
     struct position direction = { dis_x >= dis_y ? dir_x : 0, dis_y > dis_x ? dir_y : 0 };
     return direction;
+}
+
+static int rand_bool() {
+    return rand() % 3 == 0;
 }
 
 #endif
