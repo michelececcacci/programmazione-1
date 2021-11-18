@@ -158,25 +158,25 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
 
     } else if (ghost->status == EYES) {
         /* seems to work decently even though it's not pretty at all. Edge case handling not needed*/
-        char c = G->arena.matrix[ghost->pos.j][ghost->pos.i];
+        char c = G->arena.matrix[ghost->pos.i][ghost->pos.j];
         switch (c) {
             case UP_SYM:
-                ghost->pos.j += UP;
+                ghost->pos.i += UP;
                 break;
             case DOWN_SYM:
-                ghost->pos.j += DOWN;
+                ghost->pos.i += DOWN;
                 break;
             case LEFT_SYM:
-                ghost->pos.i += LEFT;
+                ghost->pos.j += LEFT;
                 break;
             case RIGHT_SYM:
-                ghost->pos.i += RIGHT;
+                ghost->pos.j += RIGHT;
                 break;
         }
         #ifdef LOGGING
         FILE *fp;
         fp = fopen("eyes.log", "a");
-        fprintf(fp, "Position x: %d, position y: %d, ghost id: %d\n", ghost->pos.i, ghost->pos.j, ghost->id);
+        fprintf(fp, "Position x: %d, position y: %d, ghost id: %d, closest position: %c\n", ghost->pos.i, ghost->pos.j, ghost->id, c);
         fclose(fp);
         #endif
     }
