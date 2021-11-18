@@ -60,6 +60,11 @@ static int can_move_offs(struct ghosts *G, ghost *ghost, unsigned int offsetX, u
 static int can_move_dir(struct ghosts *G, ghost *ghost);
 
 /*
+ * Controlla se il fantasma può muoversi lateralmente rispetto alla sua direzione.
+ */
+static int can_move_side(struct ghosts *G, ghost *ghost);
+
+/*
  * Calcola la distanza tra due posizioni.
  */
 static double distance(struct position pos1, struct position pos2);
@@ -129,6 +134,15 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
     if (ghost->status == NORMAL) {
         if((!ghost->dir.i && !ghost->dir.j) || !can_move_dir(G, ghost)) {
             ghost->dir = closest_direction(G, P, ghost);
+        } else if(can_move_side(G, ghost)) {
+            /*
+             * La direzione può essere aggiornata se il fantasma si trova ad un "incrocio"
+             * per avere un movimento laterale (e non all'indietro)
+             */
+            struct position new_dir = closest_direction(G, P, ghost);
+            if(ghost->dir.i != -new_dir.i && ghost->dir.j != -new_dir.j) {
+                ghost->dir = new_dir;
+            }
         }
         ghost->pos.i += ghost->dir.i;
         ghost->pos.j += ghost->dir.j;
@@ -169,11 +183,6 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
 }
 
 static ghost *by_id(struct ghosts *G, unsigned int id) {
-    /*unsigned int i;
-    for (i = 0; i < G->num_ghosts; i++) {
-        if (G->ghosts[i].id == id) return &G->ghosts[i];
-    }
-    return NULL;*/
     return &G->ghosts[id];
 }
 
@@ -184,6 +193,14 @@ static int can_move_offs(struct ghosts *G, ghost *ghost, unsigned int offsetX, u
 
 static int can_move_dir(struct ghosts *G, ghost *ghost) {
     return can_move_offs(G, ghost, ghost->dir.i, ghost->dir.j);
+}
+
+static int can_move_side(struct ghosts *G, ghost *ghost) {
+    if(ghost->dir.i) {
+        return can_move_offs(G, ghost, 0, UP) || can_move_offs(G, ghost, 0, DOWN);
+    } else if(ghost->dir.j) {
+        return can_move_offs(G, ghost, RIGHT, 0) || can_move_offs(G, ghost, LEFT, 0);
+    }
 }
 
 static int is_free(struct position pos, struct ghosts *G) {
