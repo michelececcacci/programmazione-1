@@ -139,7 +139,7 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
     ghost *ghost = by_id(G, id);
 
     if (ghost->status == EYES) {
-        /* seems to work decently even though it's not pretty at all. Edge case handling not needed*/
+        /* funzionante, legge la posizione suggerita dalla matrice per tornare alla casa dei fantasmi */
         char c = G->arena.matrix[ghost->pos.i][ghost->pos.j];
         switch (c) {
             case UP_SYM:
@@ -158,7 +158,7 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
         #ifdef LOGGING
         FILE *fp;
         fp = fopen("eyes.log", "a");
-        fprintf(fp, "Position x: %d, position y: %d, ghost id: %d, closest position: %c\n", ghost->pos.i, ghost->pos.j, ghost->id, c);
+        fprintf(fp, "Position y: %d, position x: %d, ghost id: %d, closest position: %c\n", ghost->pos.i, ghost->pos.j, ghost->id, c);
         fclose(fp);
         #endif
 
@@ -169,6 +169,13 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
         || (rand_bool() && can_move_side(G, ghost))) {
         ghost->dir = relative_direction(G, P, ghost, ghost->status == NORMAL);
     }
+    /* effetto wrapping per il fantasma, se è nel "tunnel"  e nella mossa dopo arriverebbe alla fine, allora sbuca dall' altra parte*/
+    if (ghost->dir.j == LEFT && ghost->pos.j == 1){
+        ghost->pos.j = G->arena.columns - 1;
+    }
+    else if (ghost->dir.j == RIGHT  && ghost->pos.j == G->arena.columns -1 ) {
+        ghost->pos.j = 1;
+    }
 
     ghost->pos.i += ghost->dir.i;
     ghost->pos.j += ghost->dir.j;
@@ -176,9 +183,10 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
     #ifdef LOGGING
     FILE *fp;
     fp = fopen("normal.log", "a");
-    fprintf(fp, "Position x: %d, position y: %d, ghost id: %d\n", ghost->pos.i, ghost->pos.j, ghost->id);
+    fprintf(fp, "Position y: %d, position x: %d, ghost id: %d\n", ghost->pos.i, ghost->pos.j, ghost->id);
     fclose(fp);
     #endif
+    return ghost->pos;
 }
 
 static ghost *by_id(struct ghosts *G, unsigned int id) {
