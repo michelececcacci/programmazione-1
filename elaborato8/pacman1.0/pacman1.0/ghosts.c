@@ -169,12 +169,12 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
         || (rand_bool() && can_move_side(G, ghost))) {
         ghost->dir = relative_direction(G, P, ghost, ghost->status == NORMAL);
     }
-    /* effetto wrapping per il fantasma, se è nel "tunnel"  e nella mossa dopo arriverebbe alla fine, allora sbuca dall' altra parte*/
-    if (ghost->dir.j == LEFT && ghost->pos.j == 1){
-        ghost->pos.j = G->arena.columns - 1;
+    /* effetto wrapping per il fantasma, se è nel "tunnel" e nella mossa dopo arriverebbe alla fine, allora sbuca dall'altra parte */
+    if (ghost->dir.j == LEFT && ghost->pos.j == 1) {
+        ghost->pos.j = G->arena.columns;
     }
-    else if (ghost->dir.j == RIGHT  && ghost->pos.j == G->arena.columns -1 ) {
-        ghost->pos.j = 1;
+    else if (ghost->dir.j == RIGHT && ghost->pos.j == G->arena.columns - 1) {
+        ghost->pos.j = -1;
     }
 
     ghost->pos.i += ghost->dir.i;
