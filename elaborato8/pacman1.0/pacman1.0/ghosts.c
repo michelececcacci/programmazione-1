@@ -277,7 +277,7 @@ static struct position relative_direction(struct ghosts *G, struct pacman *P, gh
         new.j += DOWN;
     }
 
-    struct position direction = { dis_x >= dis_y == closest ? dir_x : 0, dis_y > dis_x == closest ? dir_y : 0 };
+    struct position direction = { dis_x >= dis_y ? dir_x : 0, dis_y > dis_x ? dir_y : 0 };
     return direction;
 }
 
