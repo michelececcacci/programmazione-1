@@ -218,11 +218,11 @@ static int is_free(struct position pos, struct ghosts *G, struct pacman *P) {
         ghost ghost = G->ghosts[i];
         if (ghost.pos.i == pos.i && ghost.pos.j == pos.j) return 0;
     }
-    // if (0 == SCARED_NORMAL)
-    // {
-    //     /* if pacman is already occupying the cell it returns 0 */
-    //     return !(pos.j ==  pacman_get_position(P).j && pos.i == pacman_get_position(P).i);
-    // }
+    if (G->ghosts[0].status != NORMAL)
+     {
+        /* if pacman is already occupying the cell it returns 0 */
+        return !(pos.j ==  pacman_get_position(P).j && pos.i == pacman_get_position(P).i);
+    }
     return 1;
 }
 
