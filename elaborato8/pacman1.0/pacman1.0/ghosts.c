@@ -47,22 +47,22 @@ static ghost *by_id(struct ghosts *G, unsigned int id);
 /*
  * Controlla se una posizione è libera da muri o fantasmi.
  */
-static int is_free(struct position pos, struct ghosts *G);
+static int is_free(struct position pos, struct ghosts *G, struct pacman *P);
 
 /*
  * Controlla se il fantasma può muoversi dalla sua posizione verso un determinato offset.
  */
-static int can_move_offs(struct ghosts *G, ghost *ghost, unsigned int offsetX, unsigned int offsetY);
+static int can_move_offs(struct ghosts *G, ghost *ghost, struct pacman *P, unsigned int offsetX, unsigned int offsetY);
 
 /*
  * Controlla se il fantasma può muoversi dalla sua posizione verso la sua direzione.
  */
-static int can_move_dir(struct ghosts *G, ghost *ghost);
+static int can_move_dir(struct ghosts *G, ghost *ghost, struct pacman *P);
 
 /*
  * Controlla se il fantasma può muoversi lateralmente rispetto alla sua direzione.
  */
-static int can_move_side(struct ghosts *G, ghost *ghost);
+static int can_move_side(struct ghosts *G, ghost *ghost, struct pacman *P);
 
 /*
  * Calcola la distanza tra due posizioni.
@@ -165,8 +165,8 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
         return ghost->pos;
     }
 
-    if ((!ghost->dir.i && !ghost->dir.j) || !can_move_dir(G, ghost)
-        || (rand_bool() && can_move_side(G, ghost))) {
+    if ((!ghost->dir.i && !ghost->dir.j) || !can_move_dir(G, ghost, P)
+        || (rand_bool() && can_move_side(G, ghost, P))) {
         ghost->dir = relative_direction(G, P, ghost, ghost->status == NORMAL);
     }
     /* effetto wrapping per il fantasma, se è nel "tunnel" e nella mossa dopo arriverebbe alla fine, allora sbuca dall'altra parte */
@@ -193,24 +193,24 @@ static ghost *by_id(struct ghosts *G, unsigned int id) {
     return &G->ghosts[id];
 }
 
-static int can_move_offs(struct ghosts *G, ghost *ghost, unsigned int offsetX, unsigned int offsetY) {
+static int can_move_offs(struct ghosts *G, ghost *ghost, struct pacman *P, unsigned int offsetX, unsigned int offsetY) {
     struct position pos = {ghost->pos.i + offsetX, ghost->pos.j + offsetY};
-    return is_free(pos, G);
+    return is_free(pos, G, P);
 }
 
-static int can_move_dir(struct ghosts *G, ghost *ghost) {
-    return can_move_offs(G, ghost, ghost->dir.i, ghost->dir.j);
+static int can_move_dir(struct ghosts *G, ghost *ghost, struct pacman *P) {
+    return can_move_offs(G, ghost, P, ghost->dir.i, ghost->dir.j);
 }
 
-static int can_move_side(struct ghosts *G, ghost *ghost) {
+static int can_move_side(struct ghosts *G, ghost *ghost, struct pacman *P) {
     if(ghost->dir.i) {
-        return can_move_offs(G, ghost, 0, UP) || can_move_offs(G, ghost, 0, DOWN);
+        return can_move_offs(G, ghost, P, 0, UP) || can_move_offs(G, ghost, P, 0, DOWN);
     } else if(ghost->dir.j) {
-        return can_move_offs(G, ghost, RIGHT, 0) || can_move_offs(G, ghost, LEFT, 0);
+        return can_move_offs(G, ghost, P, RIGHT, 0) || can_move_offs(G, ghost, P, LEFT, 0);
     }
 }
 
-static int is_free(struct position pos, struct ghosts *G) {
+static int is_free(struct position pos, struct ghosts *G, struct pacman *P) {
     if(G->arena.matrix[pos.i][pos.j] == XWALL_SYM) return 0;
 
     unsigned int i;
@@ -218,6 +218,11 @@ static int is_free(struct position pos, struct ghosts *G) {
         ghost ghost = G->ghosts[i];
         if (ghost.pos.i == pos.i && ghost.pos.j == pos.j) return 0;
     }
+    // if (0 == SCARED_NORMAL)
+    // {
+    //     /* if pacman is already occupying the cell it returns 0 */
+    //     return !(pos.j ==  pacman_get_position(P).j && pos.i == pacman_get_position(P).i);
+    // }
     return 1;
 }
 
@@ -246,13 +251,13 @@ static struct position relative_direction(struct ghosts *G, struct pacman *P, gh
      * per evitare situazioni di stallo.
      */
 
-    if(can_move_offs(G, ghost, LEFT, 0) && !ghost_dir.i) {
+    if(can_move_offs(G, ghost, P, LEFT, 0) && !ghost_dir.i) {
         new.i += LEFT;
         dis_x = distance(pacman_pos, new);
         dir_x = LEFT;
         new.i -= LEFT;
     }
-    if(can_move_offs(G, ghost, RIGHT, 0) && !ghost_dir.i) {
+    if(can_move_offs(G, ghost, P, RIGHT, 0) && !ghost_dir.i) {
         new.i += RIGHT;
         double right_distance = distance(pacman_pos, new);
         if(dis_x < 0 || dis_x > right_distance == closest) {
@@ -261,13 +266,13 @@ static struct position relative_direction(struct ghosts *G, struct pacman *P, gh
         }
         new.i -= RIGHT;
     }
-    if(can_move_offs(G, ghost, 0, UP) && !ghost_dir.j) {
+    if(can_move_offs(G, ghost, P, 0, UP) && !ghost_dir.j) {
         new.j += UP;
         dis_y = distance(pacman_pos, new);
         dir_y = UP;
         new.j -= UP;
     }
-    if(can_move_offs(G, ghost, 0, DOWN) && !ghost_dir.j) {
+    if(can_move_offs(G, ghost, P, 0, DOWN) && !ghost_dir.j) {
         new.j += DOWN;
         double down_distance = distance(pacman_pos, new);
         if(dis_y < 0 || dis_y > down_distance == closest) {
