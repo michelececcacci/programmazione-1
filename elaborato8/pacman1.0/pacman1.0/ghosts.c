@@ -239,7 +239,7 @@ static struct position closest_position(struct position old_pos, struct ghosts *
         }
         
         if (is_in_arena(left_pos, G) && is_free(left_pos, G, P)) {
-            right_dis = distance(right_pos, pacman_pos);
+            left_dis = distance(left_pos, pacman_pos);
         }
         else if (is_in_arena(right_pos, G) && is_free(right_pos, G, P)) {
             right_dis = distance(right_pos, pacman_pos);
@@ -251,7 +251,8 @@ static struct position closest_position(struct position old_pos, struct ghosts *
         fprintf(fp, "up: %f, down: %f, left: %f, right: %f, best: %f\n", up_dis, down_dis, left_dis, right_dis,  best_dis);
         fclose(fp);
         #endif
-        if (best_dis == right_dis) return right_pos;
+        if (best_dis == 1000) return old_pos;
+        else if (best_dis == right_dis) return right_pos;
         else if (best_dis == up_dis) return up_pos;
         else if (best_dis == down_dis) return down_pos;
         else if (best_dis == left_dis) return left_pos;
