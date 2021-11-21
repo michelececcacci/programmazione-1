@@ -18,7 +18,9 @@
 #define RIGHT 1
 
 #define MIN_4(a, b, c, d) (MIN_2(MIN_2(a, b), MIN_2(c, d)))
-#define MIN_2(a, b) (a) > (b) ? (a) : (b)
+#define MIN_2(a, b) (a) < (b) ? (a) : (b)
+#define MAX_2(a, b) (a) > (b) ? (a) : (b)
+#define MAX_4(a, b, c, d) (MAX_2(MAX_2(a, b), MAX_2(c, d)))
 
 typedef struct ghost {
     unsigned int id;
@@ -111,31 +113,24 @@ enum ghost_status ghosts_get_status(struct ghosts *G, unsigned int id) {
 }
 
 
+static struct position closest_position(struct position old_pos, struct ghosts *G, struct pacman *P, struct ghost *ghost);
+
 /* Move the ghost id (according to its status). Returns the new position */
 struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id) {
     ghost *ghost = by_id(G, id);
     struct position old_pos = ghost->pos;
     struct position tmp_pos = old_pos;
+    struct position pacman_pos = pacman_get_position(P);
 
     if (ghost->status == NORMAL) {
-        struct position up_pos = old_pos, down_pos = old_pos, left_pos = old_pos, right_pos = old_pos;
-        up_pos.i += UP;
-        down_pos.i += DOWN;
-        left_pos.j += LEFT;
-        right_pos.j += RIGHT;
-        if (is_in_arena(up_pos, G) && is_free(up_pos, G, P)) {
-            ghost->pos = up_pos;
-        }
-        else if (is_in_arena(up_pos, G) && is_free(down_pos, G, P)) {
-            ghost->pos = down_pos;
-        }
-        
-        else if (is_in_arena(left_pos, G) && is_free(left_pos, G, P)) {
-            ghost->pos = left_pos;
-        }
-        else if (is_in_arena(left_pos, G) && is_free(right_pos, G, P)) {
-            ghost->pos = right_pos;
-        }
+        /* todo doesn't work properly */
+        ghost->pos = closest_position(old_pos, G, P, ghost);
+        #ifdef LOGGING
+        FILE *fp;
+        fp = fopen("normal.log", "a");
+        fprintf(fp, "Position y: %d, position x: %d, ghost id: %d\n", ghost->pos.i, ghost->pos.j, ghost->id );
+        fclose(fp);
+        #endif
     }
     else if (ghost->status == EYES) {
         /* funzionante, legge la posizione suggerita dalla matrice per tornare alla casa dei fantasmi */
@@ -165,22 +160,25 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
     }
     else {
         struct position up_pos = old_pos, down_pos = old_pos, left_pos = old_pos, right_pos = old_pos;
+        float up_dis = 0,  down_dis  = 0,  left_dis  = 0, right_dis = 0, best_dis;
         up_pos.i += UP;
         down_pos.i += DOWN;
         left_pos.j += LEFT;
         right_pos.j += RIGHT;
-        if (is_in_arena(up_pos, G) && is_free_other(up_pos, G, P)) {
-            ghost->pos = up_pos;
+        if (is_in_arena(up_pos, G) || !is_free_other(up_pos, G, P)) {
+            up_dis = distance(up_pos, pacman_pos);
         }
-        else if (is_in_arena(up_pos, G) && is_free_other(down_pos, G, P)) {
-            ghost->pos = down_pos;
-        }
+        else if (is_in_arena(down_pos, G) && is_free_other(down_pos, G, P)) {
+            down_dis = distance(down_pos, pacman_pos);
+            }
         else if (is_in_arena(left_pos, G)&& is_free_other(left_pos, G, P)) {
-            ghost->pos = left_pos;
+            left_dis = distance(left_pos, pacman_pos);
         }
         else if (is_in_arena(right_pos, G) && is_free_other(right_pos, G, P)) {
-            ghost->pos = right_pos;
+            right_dis = distance(right_pos, pacman_pos);
+
         }
+        best_dis = MAX_4(up_dis, down_dis, left_dis, right_dis);
     }
     return ghost->pos;
 }
@@ -201,7 +199,7 @@ static int rand_bool() {
 }
 
 static int is_free(struct position pos, struct ghosts *G, struct pacman *P) {
-    int i, j;
+    int i;
     char mat_val = G->arena.matrix[pos.i][pos.j];
     if (mat_val == XWALL_SYM)  
         return 0;
@@ -222,5 +220,40 @@ static int is_free_other(struct position pos, struct ghosts *G, struct pacman *P
 
 static int is_in_arena(struct position pos, struct ghosts *G){
     return (pos.i < G->arena.columns && pos.j < G->arena.rows);
+}
+
+static struct position closest_position(struct position old_pos, struct ghosts *G, struct pacman *P, struct ghost *ghost){
+        struct position pacman_pos = pacman_get_position(P);
+        struct position up_pos = old_pos, down_pos = old_pos, left_pos = old_pos, right_pos = old_pos;
+        /* left and right distances do not seem to work , they are always 1000 no matter what.*/
+        float left_dis = 1000, right_dis = 1000, up_dis = 1000, down_dis = 1000, best_dis = 1000;
+        up_pos.i += UP;
+        down_pos.i += DOWN;
+        left_pos.j += LEFT;
+        right_pos.j += RIGHT;
+        if (is_in_arena(up_pos, G) && is_free(up_pos, G, P)) {
+            up_dis = distance(up_pos, pacman_pos);
+        }
+        if (is_in_arena(down_pos, G) && is_free(down_pos, G, P)) {
+            down_dis = distance(down_pos, pacman_pos);
+        }
+        
+        if (is_in_arena(left_pos, G) && is_free(left_pos, G, P)) {
+            right_dis = distance(right_pos, pacman_pos);
+        }
+        else if (is_in_arena(right_pos, G) && is_free(right_pos, G, P)) {
+            right_dis = distance(right_pos, pacman_pos);
+        }
+        best_dis = MIN_4(up_dis, down_dis, left_dis, right_dis);
+        #ifdef LOGGING
+        FILE *fp;
+        fp = fopen("closest_position.log", "a");
+        fprintf(fp, "up: %f, down: %f, left: %f, right: %f, best: %f\n", up_dis, down_dis, left_dis, right_dis,  best_dis);
+        fclose(fp);
+        #endif
+        if (best_dis == right_dis) return right_pos;
+        else if (best_dis == up_dis) return up_pos;
+        else if (best_dis == down_dis) return down_pos;
+        else if (best_dis == left_dis) return left_pos;
 }
 #endif
