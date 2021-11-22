@@ -161,6 +161,14 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
     }
     else {
         ghost->pos = furthest_position(old_pos, G, P, ghost);
+        #ifdef LOGGING
+        FILE *fp;
+        fp = fopen("other.log", "a");
+        fprintf(fp, "Position y: %d, position x: %d, ghost id: %d\n", ghost->pos.i, ghost->pos.j, ghost->id );
+        fclose(fp);
+        #endif
+ 
+
     }
     return ghost->pos;
 }
@@ -207,8 +215,11 @@ static int is_in_arena(struct position pos, struct ghosts *G){
 static struct position closest_position(struct position old_pos, struct ghosts *G, struct pacman *P, struct ghost *ghost){
         struct position pacman_pos = pacman_get_position(P);
         struct position up_pos = old_pos, down_pos = old_pos, left_pos = old_pos, right_pos = old_pos;
-        /* left and right distances do not seem to work , they are always 1000 no matter what.*/
         float left_dis = 1000, right_dis = 1000, up_dis = 1000, down_dis = 1000, best_dis = 1000;
+        if (old_pos.j == G->arena.columns - 1 && !IS_WALL(G->arena.matrix, right_pos) && IS_WALL(G->arena.matrix, up_pos) && IS_WALL(G->arena.matrix, down_pos)) {
+            old_pos.j = 0;
+            return old_pos;
+        }
         up_pos.i += UP;
         down_pos.i += DOWN;
         left_pos.j += LEFT;
@@ -243,8 +254,11 @@ static struct position closest_position(struct position old_pos, struct ghosts *
 static struct position furthest_position(struct position old_pos, struct ghosts *G, struct pacman *P, struct ghost *ghost){
     struct position pacman_pos = pacman_get_position(P);
     struct position up_pos = old_pos, down_pos = old_pos, left_pos = old_pos, right_pos = old_pos;
-    /* left and right distances do not seem to work , they are always 1000 no matter what.*/
     float left_dis = 0, right_dis = 0, up_dis = 0, down_dis = 0, best_dis = 0;
+    if (old_pos.j == G->arena.columns - 1 && !IS_WALL(G->arena.matrix, right_pos) && IS_WALL(G->arena.matrix, up_pos) && IS_WALL(G->arena.matrix, down_pos)) {
+        old_pos.j = 0;
+        return old_pos;
+    }
     up_pos.i += UP;
     down_pos.i += DOWN;
     left_pos.j += LEFT;
