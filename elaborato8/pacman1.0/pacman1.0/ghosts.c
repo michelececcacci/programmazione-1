@@ -2,7 +2,6 @@
 
 #define GHOSTS_STUD
 #ifdef GHOSTS_STUD
-//#define LOGGING
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -156,12 +155,6 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
                 ghost->pos.j += RIGHT;
                 break;
         }
-#ifdef LOGGING
-        FILE *fp;
-        fp = fopen("eyes.log", "a");
-        fprintf(fp, "Position y: %d, position x: %d, ghost id: %d, closest position: %c\n", ghost->pos.i, ghost->pos.j, ghost->id, c);
-        fclose(fp);
-#endif
 
         return ghost->pos;
     }
@@ -180,13 +173,6 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
 
     ghost->pos.i += ghost->dir.i;
     ghost->pos.j += ghost->dir.j;
-
-#ifdef LOGGING
-    FILE *fp;
-    fp = fopen("normal.log", "a");
-    fprintf(fp, "Position y: %d, position x: %d, ghost id: %d\n", ghost->pos.i, ghost->pos.j, ghost->id);
-    fclose(fp);
-#endif
     return ghost->pos;
 }
 
@@ -195,12 +181,12 @@ static ghost *by_id(struct ghosts *G, unsigned int id) {
 }
 
 static int can_move_offs(struct ghosts *G, ghost *ghost, struct pacman *P, unsigned int offsetX, unsigned int offsetY) {
-    struct position pos = {ghost->pos.i + offsetX, ghost->pos.j + offsetY};
+    struct position pos = {ghost->pos.i + offsetY, ghost->pos.j + offsetX};
     return is_free(pos, G, P);
 }
 
 static int can_move_dir(struct ghosts *G, ghost *ghost, struct pacman *P) {
-    return can_move_offs(G, ghost, P, ghost->dir.i, ghost->dir.j);
+    return can_move_offs(G, ghost, P, ghost->dir.j, ghost->dir.i);
 }
 
 static int can_move_side(struct ghosts *G, ghost *ghost, struct pacman *P) {
@@ -213,23 +199,16 @@ static int can_move_side(struct ghosts *G, ghost *ghost, struct pacman *P) {
 
 static int is_free(struct position pos, struct ghosts *G, struct pacman *P) {
     if(pos.j >= G->arena.columns || pos.i >= G->arena.rows) return 0;
-    if(G->arena.matrix[pos.i][pos.j] == XWALL_SYM) return 0;
+    if(IS_WALL(G->arena.matrix, pos))   return 0;
+    if(IS_GHOST(G->arena.matrix, pos))  return 0;
+    if(IS_PACMAN(G->arena.matrix, pos)) return 0;
 
-    unsigned int i;
-    for (i = 0; i < G->num_ghosts; i++) {
-        ghost ghost = G->ghosts[i];
-        if (ghost.pos.i == pos.i && ghost.pos.j == pos.j) return 0;
-    }
-    if (G->ghosts[0].status != NORMAL) {
-        /* if pacman is already occupying the cell it returns 0 */
-        return !(pos.j == pacman_get_position(P).j && pos.i == pacman_get_position(P).i);
-    }
     return 1;
 }
 
 static double distance(struct position pos1, struct position pos2) {
-    unsigned int distance_x = (pos1.i - pos2.i) * (pos1.i - pos2.i);
-    unsigned int distance_y = (pos1.j - pos2.j) * (pos1.j - pos2.j);
+    unsigned int distance_x = (pos1.j - pos2.j) * (pos1.j - pos2.j);
+    unsigned int distance_y = (pos1.i - pos2.i) * (pos1.i - pos2.i);
     return sqrt(distance_x + distance_y);
 }
 
@@ -254,9 +233,9 @@ static struct position relative_direction(struct ghosts *G, struct pacman *P, gh
     int x, y;
     for(x = LEFT; x <= RIGHT; x++) {
         for(y = UP; y <= DOWN; y++) {
-            if(((x && !ghost_dir.i) || (y && !ghost_dir.j)) && !(x && y) && can_move_offs(G, ghost, P, x, y)) {
-                new.i = x;
-                new.j = y;
+            if(((x && !ghost_dir.j) || (y && !ghost_dir.i)) && !(x && y) && can_move_offs(G, ghost, P, x, y)) {
+                new.j = x;
+                new.i = y;
                 double dist = distance(pacman_pos, new);
                 if(dis > dist == closest) {
                     dis = dist;
@@ -300,7 +279,7 @@ static struct position relative_direction(struct ghosts *G, struct pacman *P, gh
     }
 */
 
-    struct position direction = { dir_x, dir_y };
+    struct position direction = { dir_y, dir_x };
     return direction;
 }
 
