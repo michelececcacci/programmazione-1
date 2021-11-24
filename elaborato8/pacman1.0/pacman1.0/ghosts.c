@@ -5,9 +5,14 @@
 #include "pacman.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
  
 #define LOGGING
 
+#define MIN_4(a, b, c, d) (MIN_2(MIN_2(a, b), MIN_2(c, d)))
+#define MIN_2(a, b) (a) < (b) ? (a) : (b)
+#define MAX_2(a, b) (a) > (b) ? (a) : (b)
+#define MAX_4(a, b, c, d) (MAX_2(MAX_2(a, b), MAX_2(c, d)))
 static const struct position UNK_POSITION = {-1,-1}; 
 
 struct ghost {
@@ -88,8 +93,17 @@ enum ghost_status ghosts_get_status(struct ghosts *G , unsigned int id){
     return (G != NULL) ? G->ghosts_arr[id].status : UNK_GHOST_STATUS;
 }
 
-static int is_in_arena(struct ghosts *G, struct position pos);
+/* Returns 1 if the position is in the arena */
+static int is_in_arena(struct position pos, struct ghosts *G);
 
+/* Distance between 2 positions */
+static double distance(struct position pos1, struct position pos2) ;
+
+/* Direction that has the smallest possible distance from a position */
+static enum direction closest_direction(struct position old_pos, struct ghosts *G, struct pacman *P, struct ghost *ghost);
+
+/* Direction that has the biggest possible distance from a position */
+static enum direction furthest_direction(struct position old_pos, struct ghosts *G, struct pacman *P, struct ghost *ghost);
 struct position ghosts_move(struct ghosts *G , struct pacman *P , unsigned int id ){
     struct ghost *g = &G->ghosts_arr[id];
     if (g->status == NORMAL){
@@ -125,13 +139,12 @@ struct position ghosts_move(struct ghosts *G , struct pacman *P , unsigned int i
         }
     }
     else {
-
     }
     return g->pos;
 }
 
 
-static int is_in_arena(struct ghosts *G, struct position pos){
+static int is_in_arena(struct position pos, struct ghosts *G){
     return (pos.i < G->ncol && pos.j < G->nrow);
 }
 static struct position new_position(struct position pos, enum direction dir, unsigned int nrow, unsigned int ncol) {
@@ -164,5 +177,89 @@ static int is_free_other(struct position pos, struct ghosts *G, struct pacman *P
     if (pos.i == pacman_pos.i && pos.j == pacman_pos.j)
         return 0;
     return is_free(pos, G, P);
+}
+
+static enum direction closest_direction(struct position old_pos, struct ghosts *G, struct pacman *P, struct ghost *ghost){
+        struct position pacman_pos = pacman_get_position(P);
+        struct position up_pos = old_pos, down_pos = old_pos, left_pos = old_pos, right_pos = old_pos;
+        float left_dis = 1000, right_dis = 1000, up_dis = 1000, down_dis = 1000, best_dis = 1000;
+        if (old_pos.j == G->ncol- 1 && !IS_WALL(G->A, right_pos) && IS_WALL(G->A, up_pos) && IS_WALL(G->A, down_pos)) {
+            old_pos.j = 0;
+            return UNK_DIRECTION;
+        }
+        up_pos.i += UP;
+        down_pos.i += DOWN;
+        left_pos.j += LEFT;
+        right_pos.j += RIGHT;
+        if (is_in_arena(up_pos, G) && is_free(up_pos, G, P)) {
+            up_dis = distance(up_pos, pacman_pos);
+        }
+        if (is_in_arena(down_pos, G) && is_free(down_pos, G, P)) {
+            down_dis = distance(down_pos, pacman_pos);
+        }
+        
+        if (is_in_arena(left_pos, G) && is_free(left_pos, G, P)) {
+            left_dis = distance(left_pos, pacman_pos);
+        }
+        else if (is_in_arena(right_pos, G) && is_free(right_pos, G, P)) {
+            right_dis = distance(right_pos, pacman_pos);
+        }
+        best_dis = MIN_4(up_dis, down_dis, left_dis, right_dis);
+        #ifdef LOGGING
+        FILE *fp;
+        fp = fopen("closest_position.log", "a");
+        fprintf(fp, "up: %f, down: %f, left: %f, right: %f, best: %f\n", up_dis, down_dis, left_dis, right_dis,  best_dis);
+        fclose(fp);
+        #endif
+        if (best_dis == right_dis) return RIGHT;
+        else if (best_dis == up_dis) return UP;
+        else if (best_dis == down_dis) return DOWN;
+        else if (best_dis == left_dis) return LEFT;
+        else return UNK_DIRECTION;
+}
+
+enum direction furthest_position(struct position old_pos, struct ghosts *G, struct pacman *P, struct ghost *ghost){
+    struct position pacman_pos = pacman_get_position(P);
+    struct position up_pos = old_pos, down_pos = old_pos, left_pos = old_pos, right_pos = old_pos;
+    float left_dis = 0, right_dis = 0, up_dis = 0, down_dis = 0, best_dis = 0;
+    if (old_pos.j == G->ncol - 1 && !IS_WALL(G->A, right_pos) && IS_WALL(G->A, up_pos) && IS_WALL(G->A, down_pos)) {
+        old_pos.j = 0;
+        return UNK_DIRECTION;
+    }
+    up_pos.i += UP;
+    down_pos.i += DOWN;
+    left_pos.j += LEFT;
+    right_pos.j += RIGHT;
+    if (is_in_arena(up_pos, G) && is_free(up_pos, G, P)) {
+        up_dis = distance(up_pos, pacman_pos);
+    }
+    if (is_in_arena(down_pos, G) && is_free(down_pos, G, P)) {
+        down_dis = distance(down_pos, pacman_pos);
+    }
+    
+    if (is_in_arena(left_pos, G) && is_free(left_pos, G, P)) {
+        left_dis = distance(left_pos, pacman_pos);
+    }
+    else if (is_in_arena(right_pos, G) && is_free(right_pos, G, P)) {
+        right_dis = distance(right_pos, pacman_pos);
+    }
+    best_dis = MAX_4(up_dis, down_dis, left_dis, right_dis);
+    #ifdef LOGGING
+    FILE *fp;
+    fp = fopen("furthest_position.log", "a");
+    fprintf(fp, "up: %f, down: %f, left: %f, right: %f, best: %f\n", up_dis, down_dis, left_dis, right_dis,  best_dis);
+    fclose(fp);
+    #endif
+    if (best_dis == right_dis) return RIGHT;
+    else if (best_dis == up_dis) return UP;
+    else if (best_dis == down_dis) return DOWN;
+    else if (best_dis == left_dis) return LEFT;
+    else return UNK_DIRECTION;
+}
+
+static double distance(struct position pos1, struct position pos2) {
+    unsigned int distance_x = (pos1.i - pos2.i) * (pos1.i - pos2.i);
+    unsigned int distance_y = (pos1.j - pos2.j) * (pos1.j - pos2.j);
+    return sqrt(distance_x + distance_y);
 }
 #endif
