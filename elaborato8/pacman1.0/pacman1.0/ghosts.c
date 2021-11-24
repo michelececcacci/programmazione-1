@@ -4,30 +4,36 @@
 #include "global.h"
 #include "pacman.h"
 #include <stdlib.h>
+#include <stdio.h>
+ 
+#define LOGGING
 
 static const struct position UNK_POSITION = {-1,-1}; 
-struct ghosts {
-    char **A;
-    unsigned int nrow;
-    unsigned int ncol;
-    struct ghost* ghosts_arr;
-    int num_ghosts;
-}; 
+
 struct ghost {
     struct position pos;
     enum direction dir;
     int id;
-    int status;
+    enum ghost_status status;
 };
+
+
+struct ghosts {
+    char **A;
+    unsigned int nrow;
+    unsigned int ncol;
+    int num_ghosts;
+    struct ghost ghosts_arr[];
+}; 
 
 /* Create the ghosts data structure */
 struct ghosts *ghosts_setup(unsigned int num_ghosts){
-    struct ghosts *G  = (struct ghosts *) calloc(1, sizeof(struct ghosts) + sizeof(struct ghost) * num_ghosts);
+    struct ghosts *G  = (struct ghosts *) malloc(sizeof(struct ghosts) + sizeof(struct ghost) * num_ghosts);
     G->A = NULL;
     G->nrow = 0;
     G->ncol = 0;
     G->num_ghosts = num_ghosts;
-    int i ;
+    int i;
     for (i = 0; i < num_ghosts; i++) {
         struct ghost new_ghost = {UNK_POSITION, UNK_DIRECTION, i, UNK_GHOST_STATUS};
         G->ghosts_arr[i] = new_ghost;
@@ -51,9 +57,7 @@ void ghosts_set_arena(struct ghosts *G , char ** A , unsigned int nrow , unsigne
 
 /* Set the position of the ghost id . */
 void ghosts_set_position(struct ghosts *G , unsigned int id , struct position pos) {
-    if (G != NULL){
-        G->ghosts_arr[id].pos = pos;
-    }
+    if (G != NULL) G->ghosts_arr[id].pos = pos;
 }
 
 /* Set the status of the ghost id . */
@@ -68,23 +72,97 @@ unsigned int ghosts_get_number(struct ghosts * G) {
 
 /* Return the position of the ghost id . */
 struct position ghosts_get_position(struct ghosts *G , unsigned int id){
-    struct position new_position = {-1, -1};
-    return (G != NULL) ? G->ghosts_arr[id].pos : new_position;
+    return (G != NULL) ? G->ghosts_arr[id].pos : UNK_POSITION;
 }
 
+/* returns the new position of the ghost based on its direction */
+static struct position new_position(struct position pos, enum direction dir, unsigned int nrow, unsigned int ncol);
 /* Move the ghost id ( according to its status ). Returns the new position */
-struct position ghosts_move(struct ghosts *G , struct pacman *P , unsigned int id ){
-    return UNK_POSITION;
-}
+
+static int is_free(struct position pos, struct ghosts *G, struct pacman *P);
+
+static int is_free_other(struct position pos, struct ghosts *G, struct pacman *P);
 
 /* Return the status of the ghost id . */
 enum ghost_status ghosts_get_status(struct ghosts *G , unsigned int id){
     return (G != NULL) ? G->ghosts_arr[id].status : UNK_GHOST_STATUS;
 }
 
-/* returns the new position of the ghost based on its direction */
-static struct position new_position(struct position pos, enum direction dir, unsigned int nrow, unsigned int ncol);
+static int is_in_arena(struct ghosts *G, struct position pos);
+
+struct position ghosts_move(struct ghosts *G , struct pacman *P , unsigned int id ){
+    struct ghost *g = &G->ghosts_arr[id];
+    if (g->status == NORMAL){
+        /* should minimize distance */
+        g->pos = new_position(g->pos, g->dir, G->nrow, G->ncol);
+    }
+    else if (g->status == EYES){
+        char c = G->A[g->pos.i][g->pos.j];
+        struct position eyes_pos = g->pos;
+        switch (c) {
+            case UP_SYM:
+                eyes_pos.i--;
+                break;
+            case DOWN_SYM:
+                eyes_pos.i++;
+                break;
+            case LEFT_SYM:
+                eyes_pos.j--;
+                break;
+            case RIGHT_SYM:
+                eyes_pos.j++;
+                break;
+        } 
+        /* todo find a decent way to implement eyes*/
+        #ifdef LOGGING
+        FILE *fp;
+        fp = fopen("eyes.log", "a");
+        fprintf(fp ,"symbol: %c\n", c);
+        fclose(fp);
+        #endif
+        if (is_free_other(eyes_pos, G, P)) {
+           g->pos = eyes_pos; 
+        }
+    }
+    else {
+
+    }
+    return g->pos;
+}
 
 
+static int is_in_arena(struct ghosts *G, struct position pos){
+    return (pos.i < G->ncol && pos.j < G->nrow);
+}
+static struct position new_position(struct position pos, enum direction dir, unsigned int nrow, unsigned int ncol) {
+	struct position new = pos;
+	switch (dir) {
+		case LEFT:  new.j = (pos.j+(ncol-1)) % ncol; break;
+		case RIGHT: new.j = (pos.j+1)        % ncol; break;
+		case UP:    new.i = (pos.i+(nrow-1)) % nrow; break;
+		case DOWN:  new.i = (pos.i+1)        % nrow; break;
+		case UNK_DIRECTION: break;
+	}
+	return new;
+}
 
+static int is_free(struct position pos, struct ghosts *G, struct pacman *P) {
+    int i;
+    char mat_val = G->A[pos.i][pos.j];
+    if (mat_val == XWALL_SYM)  
+        return 0;
+    for (i = 0; i < G->num_ghosts; i++) {
+        if ((pos.i == G->ghosts_arr[i].pos.i) && (pos.j == G->ghosts_arr[i].pos.j)) 
+            return 0;
+    }
+    return 1;
+}
+
+
+static int is_free_other(struct position pos, struct ghosts *G, struct pacman *P){
+    struct position pacman_pos = pacman_get_position(P);
+    if (pos.i == pacman_pos.i && pos.j == pacman_pos.j)
+        return 0;
+    return is_free(pos, G, P);
+}
 #endif
