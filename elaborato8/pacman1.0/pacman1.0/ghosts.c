@@ -5,6 +5,7 @@
 #include "pacman.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #include <math.h>
  
 #define LOGGING
@@ -33,6 +34,7 @@ struct ghosts {
 
 /* Create the ghosts data structure */
 struct ghosts *ghosts_setup(unsigned int num_ghosts){
+    srand(time(NULL));
     struct ghosts *G  = (struct ghosts *) malloc(sizeof(struct ghosts) + sizeof(struct ghost) * num_ghosts);
     G->A = NULL;
     G->nrow = 0;
@@ -93,20 +95,25 @@ enum ghost_status ghosts_get_status(struct ghosts *G , unsigned int id){
     return (G != NULL) ? G->ghosts_arr[id].status : UNK_GHOST_STATUS;
 }
 
-/* Returns 1 if the position is in the arena */
-static int is_in_arena(struct position pos, struct ghosts *G);
 
 static enum direction eyes_suggested_direction(char c);
 
 struct position ghosts_move(struct ghosts *G , struct pacman *P , unsigned int id ){
     struct ghost *g = &G->ghosts_arr[id];
     if (g->status == NORMAL){
-    }
+        struct position dir_pos = new_position(g->pos, g->dir, G->nrow, G->ncol);
+        if (!is_free(g->pos, G, P)){
+            int rand_dir = rand() % 4;
+            struct position rand_pos = new_position(g->pos, rand_dir, G->nrow, G->ncol);
+                if (is_free(rand_pos, G, P))
+                    g->pos = rand_pos;
+        }
+        else g->pos = dir_pos;
+   }
     else if (g->status == EYES){
         struct position eyes_pos = g->pos;
         char c = G->A[g->pos.i][g->pos.j];
         g->dir = eyes_suggested_direction(c);
-        /* todo find a decent way to implement eyes*/
         #ifdef LOGGING
         FILE *fp;
         fp = fopen("eyes.log", "a");
@@ -119,7 +126,17 @@ struct position ghosts_move(struct ghosts *G , struct pacman *P , unsigned int i
         }
     }
     else {
+        struct position dir_pos = new_position(g->pos, g->dir, G->nrow, G->ncol);
+        if (!is_free(g->pos, G, P)){
+            int rand_dir = rand() % 4;
+            struct position rand_pos = new_position(g->pos, rand_dir, G->nrow, G->ncol);
+                if (is_free(rand_pos, G, P))
+                    g->pos = rand_pos;
+        }
+        else g->pos = dir_pos;
     }
+
+
     return g->pos;
 }
 
@@ -139,14 +156,11 @@ static struct position new_position(struct position pos, enum direction dir, uns
 
 static int is_free(struct position pos, struct ghosts *G, struct pacman *P) {
     int i;
-    char mat_val = G->A[pos.i][pos.j];
-    if (mat_val == XWALL_SYM)  
-        return 0;
     for (i = 0; i < G->num_ghosts; i++) {
         if ((pos.i == G->ghosts_arr[i].pos.i) && (pos.j == G->ghosts_arr[i].pos.j)) 
             return 0;
     }
-    return 1;
+    return !IS_WALL(G->A, pos);
 }
 
 
@@ -172,6 +186,7 @@ static enum direction eyes_suggested_direction(char c){
             case RIGHT_SYM:
             return RIGHT;
         }
+    return UNK_DIRECTION;
 }
 
 #endif
