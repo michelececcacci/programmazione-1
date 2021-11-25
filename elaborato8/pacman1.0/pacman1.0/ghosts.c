@@ -121,7 +121,16 @@ struct position ghosts_move(struct ghosts *G , struct pacman *P , unsigned int i
         fclose(fp);
         #endif
         eyes_pos = new_position(g->pos, g->dir, G->nrow, G->ncol);
-        if (is_free_other(eyes_pos, G, P)) {
+        if (!is_free_other(eyes_pos, G, P)) {
+            int rand_dir = rand() % 4;
+            struct position rand_pos = new_position(eyes_pos, rand_dir, G->nrow, G->ncol);
+            while (!is_free_other(rand_pos,  G, P)) {
+                int rand_dir = rand() % 5;
+                struct position rand_pos = new_position(eyes_pos, rand_dir, G->nrow, G->ncol);
+            }
+            g->pos = rand_pos;
+        }
+        else {
             g->pos = eyes_pos;
         }
     }
@@ -130,7 +139,7 @@ struct position ghosts_move(struct ghosts *G , struct pacman *P , unsigned int i
         if (!is_free(g->pos, G, P)){
             int rand_dir = rand() % 4;
             struct position rand_pos = new_position(g->pos, rand_dir, G->nrow, G->ncol);
-                if (is_free(rand_pos, G, P))
+                if (is_free_other(rand_pos, G, P))
                     g->pos = rand_pos;
         }
         else g->pos = dir_pos;
