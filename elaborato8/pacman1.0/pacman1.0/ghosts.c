@@ -104,10 +104,14 @@ static enum direction closest_direction(struct position old_pos, struct ghosts *
 
 /* Direction that has the biggest possible distance from a position */
 static enum direction furthest_direction(struct position old_pos, struct ghosts *G, struct pacman *P, struct ghost *ghost);
+
+
+static int can_move_dir(struct position pos, enum direction dir);
+
 struct position ghosts_move(struct ghosts *G , struct pacman *P , unsigned int id ){
     struct ghost *g = &G->ghosts_arr[id];
     if (g->status == NORMAL){
-        /* should minimize distance */
+        g->dir = closest_direction(g->pos, G, P, g);   /* should minimize distance */
         g->pos = new_position(g->pos, g->dir, G->nrow, G->ncol);
     }
     else if (g->status == EYES){
@@ -135,17 +139,20 @@ struct position ghosts_move(struct ghosts *G , struct pacman *P , unsigned int i
         fclose(fp);
         #endif
         if (is_free_other(eyes_pos, G, P)) {
-           g->pos = eyes_pos; 
+            g->dir = closest_direction(g->pos, G, P, g);   /* should maximize distance */
+            g->pos = new_position(g->pos, g->dir, G->nrow, G->ncol);
         }
     }
     else {
+
+    g->pos = new_position(g->pos, g->dir, G->nrow, G->ncol);
     }
     return g->pos;
 }
 
 
 static int is_in_arena(struct position pos, struct ghosts *G){
-    return (pos.i < G->ncol && pos.j < G->nrow);
+    return (pos.i < G->ncol + 1 && pos.j < G->nrow);
 }
 static struct position new_position(struct position pos, enum direction dir, unsigned int nrow, unsigned int ncol) {
 	struct position new = pos;
@@ -183,14 +190,10 @@ static enum direction closest_direction(struct position old_pos, struct ghosts *
         struct position pacman_pos = pacman_get_position(P);
         struct position up_pos = old_pos, down_pos = old_pos, left_pos = old_pos, right_pos = old_pos;
         float left_dis = 1000, right_dis = 1000, up_dis = 1000, down_dis = 1000, best_dis = 1000;
-        if (old_pos.j == G->ncol- 1 && !IS_WALL(G->A, right_pos) && IS_WALL(G->A, up_pos) && IS_WALL(G->A, down_pos)) {
-            old_pos.j = 0;
-            return UNK_DIRECTION;
-        }
-        up_pos.i += UP;
-        down_pos.i += DOWN;
-        left_pos.j += LEFT;
-        right_pos.j += RIGHT;
+        up_pos.i--;
+        down_pos.i++;
+        left_pos.j--;
+        right_pos.j++;
         if (is_in_arena(up_pos, G) && is_free(up_pos, G, P)) {
             up_dis = distance(up_pos, pacman_pos);
         }
@@ -201,7 +204,7 @@ static enum direction closest_direction(struct position old_pos, struct ghosts *
         if (is_in_arena(left_pos, G) && is_free(left_pos, G, P)) {
             left_dis = distance(left_pos, pacman_pos);
         }
-        else if (is_in_arena(right_pos, G) && is_free(right_pos, G, P)) {
+        if (is_in_arena(right_pos, G) && is_free(right_pos, G, P)) {
             right_dis = distance(right_pos, pacman_pos);
         }
         best_dis = MIN_4(up_dis, down_dis, left_dis, right_dis);
@@ -218,29 +221,26 @@ static enum direction closest_direction(struct position old_pos, struct ghosts *
         else return UNK_DIRECTION;
 }
 
-enum direction furthest_position(struct position old_pos, struct ghosts *G, struct pacman *P, struct ghost *ghost){
+/* not working idk why */
+enum direction furthest_direction(struct position old_pos, struct ghosts *G, struct pacman *P, struct ghost *ghost){
     struct position pacman_pos = pacman_get_position(P);
     struct position up_pos = old_pos, down_pos = old_pos, left_pos = old_pos, right_pos = old_pos;
     float left_dis = 0, right_dis = 0, up_dis = 0, down_dis = 0, best_dis = 0;
-    if (old_pos.j == G->ncol - 1 && !IS_WALL(G->A, right_pos) && IS_WALL(G->A, up_pos) && IS_WALL(G->A, down_pos)) {
-        old_pos.j = 0;
-        return UNK_DIRECTION;
-    }
-    up_pos.i += UP;
-    down_pos.i += DOWN;
-    left_pos.j += LEFT;
-    right_pos.j += RIGHT;
-    if (is_in_arena(up_pos, G) && is_free(up_pos, G, P)) {
+    up_pos.i--;
+    down_pos.i++;
+    left_pos.j--;
+    right_pos.j++;
+    if (is_in_arena(up_pos, G) && is_free_other(up_pos, G, P)) {
         up_dis = distance(up_pos, pacman_pos);
     }
-    if (is_in_arena(down_pos, G) && is_free(down_pos, G, P)) {
+    if (is_in_arena(down_pos, G) && is_free_other(down_pos, G, P)) {
         down_dis = distance(down_pos, pacman_pos);
     }
     
-    if (is_in_arena(left_pos, G) && is_free(left_pos, G, P)) {
+    if (is_in_arena(left_pos, G) && is_free_other(left_pos, G, P)) {
         left_dis = distance(left_pos, pacman_pos);
     }
-    else if (is_in_arena(right_pos, G) && is_free(right_pos, G, P)) {
+    if (is_in_arena(right_pos, G) && is_free_other(right_pos, G, P)) {
         right_dis = distance(right_pos, pacman_pos);
     }
     best_dis = MAX_4(up_dis, down_dis, left_dis, right_dis);
@@ -262,4 +262,5 @@ static double distance(struct position pos1, struct position pos2) {
     unsigned int distance_y = (pos1.j - pos2.j) * (pos1.j - pos2.j);
     return sqrt(distance_x + distance_y);
 }
+
 #endif
