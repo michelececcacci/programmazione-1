@@ -181,13 +181,7 @@ static int is_free(struct position pos, struct ghosts *G, struct pacman *P) {
             return 0;
     }
     return !IS_WALL(G->A, pos);
-
-
-static int is_free(struct position pos, struct ghosts *G, struct pacman *P) {
-    if(pos.j >= G->arena.columns || pos.i >= G->arena.rows) return 0;
-    if(IS_WALL(G->arena.matrix, pos))   return 0;
-    if(IS_GHOST(G->arena.matrix, pos))  return 0;
-    if(IS_PACMAN(G->arena.matrix, pos)) return 0;
+}
 
 static int is_free_other(struct position pos, struct ghosts *G, struct pacman *P){
     struct position pacman_pos = pacman_get_position(P);
