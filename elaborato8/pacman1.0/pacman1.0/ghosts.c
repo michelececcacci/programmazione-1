@@ -1,201 +1,187 @@
+#ifndef GHOSTS_H
+#define GHOSTS_H
+
+
 #include "global.h"
-
-#define GHOSTS_STUD
-#ifdef GHOSTS_STUD
-
+#include "pacman.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include <float.h>
-#include "ghosts.h"
-#include "pacman.h"
-#include "matrix.h"
-#include "math.h"
-
-#define UP   -1
-#define DOWN  1
-#define LEFT -1
-#define RIGHT 1
+#include <math.h>
+ 
+#define LOGGING
 
 #define MIN_4(a, b, c, d) (MIN_2(MIN_2(a, b), MIN_2(c, d)))
-#define MIN_2(a, b) (a) > (b) ? (a) : (b)
+#define MIN_2(a, b) (a) < (b) ? (a) : (b)
+#define MAX_2(a, b) (a) > (b) ? (a) : (b)
+#define MAX_4(a, b, c, d) (MAX_2(MAX_2(a, b), MAX_2(c, d)))
+static const struct position UNK_POSITION = {-1,-1}; 
 
-typedef struct ghost {
-    unsigned int id;
-    int status;
+struct ghost {
     struct position pos;
-    struct position dir;
-} ghost;
-
-struct arena {
-    char **matrix;
-    unsigned int rows;
-    unsigned int columns;
+    enum direction dir;
+    int id;
+    enum ghost_status status;
 };
+
 
 struct ghosts {
-    unsigned int num_ghosts;
-    struct arena arena;
-    ghost ghosts[];
-};
-
-/*
- * Ottiene un fantasma da un ID.
- */
-static ghost *by_id(struct ghosts *G, unsigned int id);
-
-/*
- * Controlla se una posizione è libera da muri o fantasmi.
- */
-static int is_free(struct position pos, struct ghosts *G, struct pacman *P);
-
-/*
- * Controlla se il fantasma può muoversi dalla sua posizione verso un determinato offset.
- */
-static int can_move_offs(struct ghosts *G, ghost *ghost, struct pacman *P, unsigned int offsetX, unsigned int offsetY);
-
-/*
- * Controlla se il fantasma può muoversi dalla sua posizione verso la sua direzione.
- */
-static int can_move_dir(struct ghosts *G, ghost *ghost, struct pacman *P);
-
-/*
- * Controlla se il fantasma può muoversi lateralmente rispetto alla sua direzione.
- */
-static int can_move_side(struct ghosts *G, ghost *ghost, struct pacman *P);
-
-/*
- * Calcola la distanza tra due posizioni.
- */
-static double distance(struct position pos1, struct position pos2);
-
-/*
- * Una probabilità di poco inferiore al 50%.
- */
-static int rand_bool();
-
-/*
- * Trova la possibile direzione più vicina verso pacman se closest == 1, altrimenti la direzione più lontana.
- */
-static struct position relative_direction(struct ghosts *G, struct pacman *P, ghost *ghost, int closest);
+    char **A;
+    unsigned int nrow;
+    unsigned int ncol;
+    int num_ghosts;
+    struct ghost ghosts_arr[];
+}; 
 
 /* Create the ghosts data structure */
-struct ghosts *ghosts_setup(unsigned int num_ghosts) {
+struct ghosts *ghosts_setup(unsigned int num_ghosts){
     srand(time(NULL));
-
-    struct ghosts *ghosts = malloc(sizeof(struct ghosts) + sizeof(ghost) * num_ghosts);
-    ghosts->num_ghosts = num_ghosts;
-
-    unsigned int i;
+    struct ghosts *G  = (struct ghosts *) malloc(sizeof(struct ghosts) + sizeof(struct ghost) * num_ghosts);
+    G->A = NULL;
+    G->nrow = 0;
+    G->ncol = 0;
+    G->num_ghosts = num_ghosts;
+    int i;
     for (i = 0; i < num_ghosts; i++) {
-        struct position pos = {0, 0};
-        struct position dir = {0, 0};
-        ghost ghost = {i, NORMAL, pos, dir};
-        ghosts->ghosts[i] = ghost;
+        struct ghost new_ghost = {UNK_POSITION, UNK_DIRECTION, i, UNK_GHOST_STATUS};
+        G->ghosts_arr[i] = new_ghost;
     }
-
-    return ghosts;
+    return G;
 }
 
 /* Destroy the ghost data structure */
-void ghosts_destroy(struct ghosts *G) {
+void ghosts_destroy(struct ghosts * G){
     free(G);
 }
 
-/* Set the arena (A) matrix */
-void ghosts_set_arena(struct ghosts *G, char **A, unsigned int nrow,
-                      unsigned int ncol) {
-    struct arena arena = {A, nrow, ncol};
-    G->arena = arena;
+/* Set the arena ( A ) matrix */
+void ghosts_set_arena(struct ghosts *G , char ** A , unsigned int nrow , unsigned int ncol) {
+    if (G != NULL) {
+        G->A = A;
+        G->nrow = nrow;
+        G->ncol = ncol;
+    }
 }
 
-/* Set the position of the ghost id. */
-void ghosts_set_position(struct ghosts *G, unsigned int id, struct position pos) {
-    by_id(G, id)->pos = pos;
+/* Set the position of the ghost id . */
+void ghosts_set_position(struct ghosts *G , unsigned int id , struct position pos) {
+    if (G != NULL) G->ghosts_arr[id].pos = pos;
 }
 
-/* Set the status of the ghost id. */
-void ghosts_set_status(struct ghosts *G, unsigned int id, enum ghost_status status) {
-    by_id(G, id)->status = status;
+/* Set the status of the ghost id . */
+void ghosts_set_status(struct ghosts *G , unsigned int id , enum ghost_status status) {
+    if (G != NULL) G->ghosts_arr[id].status = status;
 }
 
 /* Return the number of ghosts */
-unsigned int ghosts_get_number(struct ghosts *G) {
+unsigned int ghosts_get_number(struct ghosts * G) {
     return G->num_ghosts;
 }
 
-/* Return the position of the ghost id. */
-struct position ghosts_get_position(struct ghosts *G, unsigned int id) {
-    return by_id(G, id)->pos;
+/* Return the position of the ghost id . */
+struct position ghosts_get_position(struct ghosts *G , unsigned int id){
+    return (G != NULL) ? G->ghosts_arr[id].pos : UNK_POSITION;
 }
 
-/* Return the status of the ghost id. */
-enum ghost_status ghosts_get_status(struct ghosts *G, unsigned int id) {
-    return by_id(G, id)->status;
+/* returns the new position of the ghost based on its direction */
+static struct position new_position(struct position pos, enum direction dir, unsigned int nrow, unsigned int ncol);
+/* Move the ghost id ( according to its status ). Returns the new position */
+
+static int is_free(struct position pos, struct ghosts *G, struct pacman *P);
+
+static int is_free_other(struct position pos, struct ghosts *G, struct pacman *P);
+
+/* Return the status of the ghost id . */
+enum ghost_status ghosts_get_status(struct ghosts *G , unsigned int id){
+    return (G != NULL) ? G->ghosts_arr[id].status : UNK_GHOST_STATUS;
 }
 
-/* Move the ghost id (according to its status). Returns the new position */
-struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id) {
-    ghost *ghost = by_id(G, id);
 
-    if (ghost->status == EYES) {
-        /* funzionante, legge la posizione suggerita dalla matrice per tornare alla casa dei fantasmi */
-        char c = G->arena.matrix[ghost->pos.i][ghost->pos.j];
-        switch (c) {
-            case UP_SYM:
-                ghost->pos.i += UP;
-                break;
-            case DOWN_SYM:
-                ghost->pos.i += DOWN;
-                break;
-            case LEFT_SYM:
-                ghost->pos.j += LEFT;
-                break;
-            case RIGHT_SYM:
-                ghost->pos.j += RIGHT;
-                break;
+static enum direction eyes_suggested_direction(char c);
+
+struct position ghosts_move(struct ghosts *G , struct pacman *P , unsigned int id ){
+    struct ghost *g = &G->ghosts_arr[id];
+    if (g->status == NORMAL){
+        struct position dir_pos = new_position(g->pos, g->dir, G->nrow, G->ncol);
+        if (!is_free(g->pos, G, P)){
+            struct position left_pos = new_position(g->pos, LEFT, G->nrow, G->ncol), 
+            right_pos = new_position(g->pos, RIGHT, G->nrow, G->ncol), 
+            up_pos= new_position(g->pos, UP, G->nrow, G->ncol), 
+            down_pos= new_position(g->pos, DOWN, G->nrow, G->ncol);
+            if (is_free(left_pos, G, P)) g->dir = LEFT;
+            else if (is_free(right_pos, G, P)) g->dir = RIGHT;
+            else if (is_free(up_pos, G, P)) g->dir = UP;
+            else if (is_free(down_pos, G, P)) g->dir = DOWN;
+            else   g->dir = UNK_DIRECTION;
         }
-
-        return ghost->pos;
+        g->pos = new_position(g->pos, g->dir, G->nrow, G->ncol);
+   }
+    else if (g->status == EYES){
+        struct position eyes_pos = g->pos;
+        char c = G->A[g->pos.i][g->pos.j];
+        g->dir = eyes_suggested_direction(c);
+        #ifdef LOGGING
+        FILE *fp;
+        fp = fopen("eyes.log", "a");
+        fprintf(fp ,"symbol: %c\n", c);
+        fclose(fp);
+        #endif
+        eyes_pos = new_position(g->pos, g->dir, G->nrow, G->ncol);
+        if (!is_free_other(eyes_pos, G, P)){
+            struct position left_pos = new_position(g->pos, LEFT, G->nrow, G->ncol), 
+            right_pos = new_position(g->pos, RIGHT, G->nrow, G->ncol), 
+            up_pos= new_position(g->pos, UP, G->nrow, G->ncol), 
+            down_pos= new_position(g->pos, DOWN, G->nrow, G->ncol);
+            if (is_free_other(left_pos, G, P)) g->dir = LEFT;
+            else if (is_free_other(right_pos, G, P)) g->dir = RIGHT;
+            else if (is_free_other(up_pos, G, P)) g->dir = UP;
+            else if (is_free_other(down_pos, G, P)) g->dir = DOWN;
+            else   g->dir = UNK_DIRECTION;
+        }
+        g->pos = new_position(g->pos, g->dir, G->nrow, G->ncol);
+    }
+    else {
+        struct position dir_pos = new_position(g->pos, g->dir, G->nrow, G->ncol);
+        if (!is_free_other(g->pos, G, P)){
+            struct position left_pos = new_position(g->pos, LEFT, G->nrow, G->ncol), 
+            right_pos = new_position(g->pos, RIGHT, G->nrow, G->ncol), 
+            up_pos= new_position(g->pos, UP, G->nrow, G->ncol), 
+            down_pos= new_position(g->pos, DOWN, G->nrow, G->ncol);
+            if (is_free_other(left_pos, G, P)) g->dir = LEFT;
+            else if (is_free_other(right_pos, G, P)) g->dir = RIGHT;
+            else if (is_free_other(up_pos, G, P)) g->dir = UP;
+            else if (is_free_other(down_pos, G, P)) g->dir = DOWN;
+            else   g->dir = UNK_DIRECTION;
+        }
+        g->pos = new_position(g->pos, g->dir, G->nrow, G->ncol);
     }
 
-    if ((!ghost->dir.i && !ghost->dir.j) || !can_move_dir(G, ghost, P)
-        || (rand_bool() && can_move_side(G, ghost, P))) {
-        ghost->dir = relative_direction(G, P, ghost, ghost->status == NORMAL);
+
+
+    return g->pos;
+}
+
+
+static struct position new_position(struct position pos, enum direction dir, unsigned int nrow, unsigned int ncol) {
+	struct position new = pos;
+	switch (dir) {
+		case LEFT:  new.j = (pos.j+(ncol-1)) % ncol; break;
+		case RIGHT: new.j = (pos.j+1)        % ncol; break;
+		case UP:    new.i = (pos.i+(nrow-1)) % nrow; break;
+		case DOWN:  new.i = (pos.i+1)        % nrow; break;
+		case UNK_DIRECTION: break;
+	}
+	return new;
+}
+
+static int is_free(struct position pos, struct ghosts *G, struct pacman *P) {
+    int i;
+    for (i = 0; i < G->num_ghosts; i++) {
+        if ((pos.i == G->ghosts_arr[i].pos.i) && (pos.j == G->ghosts_arr[i].pos.j)) 
+            return 0;
     }
-    /* effetto wrapping per il fantasma, se è nel "tunnel" e nella mossa dopo arriverebbe alla fine, allora sbuca dall'altra parte */
-    if (ghost->dir.j == LEFT && ghost->pos.j == 1) {
-        ghost->pos.j = G->arena.columns;
-    }
-    else if (ghost->dir.j == RIGHT && ghost->pos.j == G->arena.columns - 2) {
-        ghost->pos.j = -1;
-    }
+    return !IS_WALL(G->A, pos);
 
-    ghost->pos.i += ghost->dir.i;
-    ghost->pos.j += ghost->dir.j;
-    return ghost->pos;
-}
-
-static ghost *by_id(struct ghosts *G, unsigned int id) {
-    return &G->ghosts[id];
-}
-
-static int can_move_offs(struct ghosts *G, ghost *ghost, struct pacman *P, unsigned int offsetX, unsigned int offsetY) {
-    struct position pos = {ghost->pos.i + offsetY, ghost->pos.j + offsetX};
-    return is_free(pos, G, P);
-}
-
-static int can_move_dir(struct ghosts *G, ghost *ghost, struct pacman *P) {
-    return can_move_offs(G, ghost, P, ghost->dir.j, ghost->dir.i);
-}
-
-static int can_move_side(struct ghosts *G, ghost *ghost, struct pacman *P) {
-    if(ghost->dir.i) {
-        return can_move_offs(G, ghost, P, 0, UP) || can_move_offs(G, ghost, P, 0, DOWN);
-    } else if(ghost->dir.j) {
-        return can_move_offs(G, ghost, P, RIGHT, 0) || can_move_offs(G, ghost, P, LEFT, 0);
-    }
-}
 
 static int is_free(struct position pos, struct ghosts *G, struct pacman *P) {
     if(pos.j >= G->arena.columns || pos.i >= G->arena.rows) return 0;
@@ -203,88 +189,30 @@ static int is_free(struct position pos, struct ghosts *G, struct pacman *P) {
     if(IS_GHOST(G->arena.matrix, pos))  return 0;
     if(IS_PACMAN(G->arena.matrix, pos)) return 0;
 
-    return 1;
-}
-
-static double distance(struct position pos1, struct position pos2) {
-    unsigned int distance_x = (pos1.j - pos2.j) * (pos1.j - pos2.j);
-    unsigned int distance_y = (pos1.i - pos2.i) * (pos1.i - pos2.i);
-    return sqrt(distance_x + distance_y);
-}
-
-static struct position relative_direction(struct ghosts *G, struct pacman *P, ghost *ghost, int closest) {
+static int is_free_other(struct position pos, struct ghosts *G, struct pacman *P){
     struct position pacman_pos = pacman_get_position(P);
-    struct position ghost_pos = ghost->pos;
-    struct position ghost_dir = ghost->dir;
-
-    /* Posizione clonata */
-    struct position new = { ghost_pos.i, ghost_pos.j };
-
-    double dis = closest ? DBL_MAX : 0;
-
-    int dir_x = 0;
-    int dir_y = 0;
-
-    /*
-     * !ghost_dir.i/j permette di alternare movimenti verticali ad orizzontali
-     * per evitare situazioni di stallo.
-     */
-
-    int x, y;
-    for(x = LEFT; x <= RIGHT; x++) {
-        for(y = UP; y <= DOWN; y++) {
-            if(((x && !ghost_dir.j) || (y && !ghost_dir.i)) && !(x && y) && can_move_offs(G, ghost, P, x, y)) {
-                new.j = x;
-                new.i = y;
-                double dist = distance(pacman_pos, new);
-                if(dis > dist == closest) {
-                    dis = dist;
-                    dir_x = x;
-                    dir_y = y;
-                }
-            }
-        }
-    }
-/*
-
-    if(can_move_offs(G, ghost, P, LEFT, 0) && !ghost_dir.i) {
-        new.i += LEFT;
-        dis_x = distance(pacman_pos, new);
-        dir_x = LEFT;
-        new.i -= LEFT;
-    }
-    if(can_move_offs(G, ghost, P, RIGHT, 0) && !ghost_dir.i) {
-        new.i += RIGHT;
-        double right_distance = distance(pacman_pos, new);
-        if(dis_x < 0 || dis_x > right_distance == closest) {
-            dis_x = right_distance;
-            dir_x = RIGHT;
-        }
-        new.i -= RIGHT;
-    }
-    if(can_move_offs(G, ghost, P, 0, UP) && !ghost_dir.j) {
-        new.j += UP;
-        dis_y = distance(pacman_pos, new);
-        dir_y = UP;
-        new.j -= UP;
-    }
-    if(can_move_offs(G, ghost, P, 0, DOWN) && !ghost_dir.j) {
-        new.j += DOWN;
-        double down_distance = distance(pacman_pos, new);
-        if(dis_y < 0 || dis_y > down_distance == closest) {
-            dis_y = down_distance;
-            dir_y = DOWN;
-        }
-        new.j += DOWN;
-    }
-*/
-
-    struct position direction = { dir_y, dir_x };
-    return direction;
+    if (pos.i == pacman_pos.i && pos.j == pacman_pos.j)
+        return 0;
+    return is_free(pos, G, P);
 }
 
-static int rand_bool() {
-    return rand() % 3 == 0;
+
+static enum direction eyes_suggested_direction(char c){
+    switch (c) {
+            case UP_SYM:
+            return UP;
+                break;
+            case DOWN_SYM:
+            return  DOWN;
+                break;
+            case LEFT_SYM:
+            return  LEFT;
+                break;
+            case RIGHT_SYM:
+            return RIGHT;
+        }
+    return UNK_DIRECTION;
 }
+
 
 #endif
