@@ -51,7 +51,7 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-elaborato6/pong1.0/pong1.0/curses.h
-elaborato6/pong1.0/pong1.0/panel.h
+*/curses.h
+*/panel.h
 
 elaborato7/minesweeper

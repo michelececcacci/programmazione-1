@@ -1,5 +1,12 @@
 CFLAG = -Wall -pedantic -Wno-comment -O3 -std=c89
- 
+LDFLAGS = -l
+
+ifeq ($(OS),Windows_NT)
+	LDFLAGS += pdcurses
+else
+	LDFLAGS += ncurses
+endif
+
 all: pacman 
 
 queue.o: global.h queue.h queue.c
@@ -21,7 +28,7 @@ display.o: global.h display.h display.c
 	gcc $(CFLAG) -c display.c
 
 pacman: queue.o matrix.o arena.o pacman.o ghosts.o display.o main.c
-	gcc $(CFLAG)   queue.o matrix.o arena.o ghosts.o display.o pacman.o main.c -o pacman  -lncurses -lm 
+	gcc $(CFLAG)   queue.o matrix.o arena.o ghosts.o display.o pacman.o main.c -o pacman $(LDFLAGS) -lm
 
 clean:
 	rm -rf *.o pacman \

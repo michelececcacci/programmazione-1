@@ -1,7 +1,7 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#include <curses.h>
+#include "curses.h"
 #include "global.h"
 #include "arena.h"
 
