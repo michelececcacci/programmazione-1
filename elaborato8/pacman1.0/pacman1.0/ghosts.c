@@ -8,10 +8,6 @@
 #include <math.h>
 #include <float.h>
 
-#define MIN_4(a, b, c, d) (MIN_2(MIN_2(a, b), MIN_2(c, d)))
-#define MIN_2(a, b) (a) < (b) ? (a) : (b)
-#define MAX_2(a, b) (a) > (b) ? (a) : (b)
-#define MAX_4(a, b, c, d) (MAX_2(MAX_2(a, b), MAX_2(c, d)))
 static const struct position UNK_POSITION = {-1, -1};
 
 struct ghost {
@@ -30,9 +26,22 @@ struct ghosts {
 };
 
 static double distance(struct position pos1, struct position pos2);
+
 static enum direction relative_direction(struct ghosts *G, struct pacman *P, struct ghost *ghost, int closest);
+
 static struct position dir_to_relative_pos(enum direction dir);
+
 static enum direction relative_pos_to_dir(struct position rel);
+
+/* returns the new position of the ghost based on its direction */
+static struct position new_position(struct position pos, enum direction dir, unsigned int nrow, unsigned int ncol);
+
+/* Move the ghost id ( according to its status ). Returns the new position */
+static int is_free(struct position pos, struct ghosts *G, struct pacman *P);
+
+static int is_free_other(struct position pos, struct ghosts *G, struct pacman *P);
+
+static enum direction eyes_suggested_direction(char c);
 
 /* Create the ghosts data structure */
 struct ghosts *ghosts_setup(unsigned int num_ghosts) {
@@ -84,21 +93,10 @@ struct position ghosts_get_position(struct ghosts *G, unsigned int id) {
     return (G != NULL) ? G->ghosts_arr[id].pos : UNK_POSITION;
 }
 
-/* returns the new position of the ghost based on its direction */
-static struct position new_position(struct position pos, enum direction dir, unsigned int nrow, unsigned int ncol);
-
-/* Move the ghost id ( according to its status ). Returns the new position */
-
-static int is_free(struct position pos, struct ghosts *G, struct pacman *P);
-
-static int is_free_other(struct position pos, struct ghosts *G, struct pacman *P);
-
 /* Return the status of the ghost id . */
 enum ghost_status ghosts_get_status(struct ghosts *G, unsigned int id) {
     return (G != NULL) ? G->ghosts_arr[id].status : UNK_GHOST_STATUS;
 }
-
-static enum direction eyes_suggested_direction(char c);
 
 struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id) {
     struct ghost *g = &G->ghosts_arr[id];
@@ -133,7 +131,6 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
     return g->pos;
 }
 
-
 static struct position new_position(struct position pos, enum direction dir, unsigned int nrow, unsigned int ncol) {
     struct position new = pos;
     switch (dir) {
@@ -156,8 +153,8 @@ static struct position new_position(struct position pos, enum direction dir, uns
 }
 
 static int is_free(struct position pos, struct ghosts *G, struct pacman *P) {
-    if(pos.j >= G->ncol || pos.i >= G->nrow) return 1;
-    if(pos.j < 0 || pos.i < 0) return 1;
+    if (pos.j >= G->ncol || pos.i >= G->nrow) return 1;
+    if (pos.j < 0 || pos.i < 0) return 1;
     int i;
     for (i = 0; i < G->num_ghosts; i++) {
         if ((pos.i == G->ghosts_arr[i].pos.i) && (pos.j == G->ghosts_arr[i].pos.j))
@@ -215,10 +212,10 @@ static struct position dir_to_relative_pos(enum direction dir) {
 }
 
 static enum direction relative_pos_to_dir(struct position rel) {
-    if(rel.j == -1) return LEFT;
-    if(rel.j == 1) return RIGHT;
-    if(rel.i == -1) return UP;
-    if(rel.i == 1) return DOWN;
+    if (rel.j == -1) return LEFT;
+    if (rel.j == 1) return RIGHT;
+    if (rel.i == -1) return UP;
+    if (rel.i == 1) return DOWN;
     return UNK_DIRECTION;
 }
 
@@ -228,7 +225,7 @@ static enum direction relative_direction(struct ghosts *G, struct pacman *P, str
     struct position ghost_dir = dir_to_relative_pos(ghost->dir);
 
     /* Posizione clonata */
-    struct position new = { ghost_pos.i, ghost_pos.j };
+    struct position new = {ghost_pos.i, ghost_pos.j};
 
     double dis = closest ? DBL_MAX : 0;
 
@@ -241,13 +238,13 @@ static enum direction relative_direction(struct ghosts *G, struct pacman *P, str
      */
 
     int x, y;
-    for(x = -1; x <= 1; x++) {
-        for(y = -1; y <= 1; y++) {
+    for (x = -1; x <= 1; x++) {
+        for (y = -1; y <= 1; y++) {
             new.i = ghost_pos.i + y;
             new.j = ghost_pos.j + x;
-            if(((x && !ghost_dir.j) || (y && !ghost_dir.i)) && !(x && y) && is_free(new, G, P)) {
+            if (((x && !ghost_dir.j) || (y && !ghost_dir.i)) && !(x && y) && is_free(new, G, P)) {
                 double dist = distance(pacman_pos, new);
-                if(dis > dist == closest) {
+                if (dis > dist == closest) {
                     dis = dist;
                     dir_x = x;
                     dir_y = y;
@@ -256,7 +253,7 @@ static enum direction relative_direction(struct ghosts *G, struct pacman *P, str
         }
     }
 
-    struct position direction = { dir_y, dir_x };
+    struct position direction = {dir_y, dir_x};
     return relative_pos_to_dir(direction);
 }
 
