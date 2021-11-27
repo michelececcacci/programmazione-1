@@ -100,10 +100,7 @@ enum ghost_status ghosts_get_status(struct ghosts *G, unsigned int id) {
 
 struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id) {
     struct ghost *g = &G->ghosts_arr[id];
-    if (g->status == NORMAL) {
-        g->dir = relative_direction(G, P, g, 1);
-        g->pos = new_position(g->pos, g->dir, G->nrow, G->ncol);
-    } else if (g->status == EYES) {
+    if (g->status == EYES) {
         struct position eyes_pos = g->pos;
         char c = G->A[g->pos.i][g->pos.j];
         g->dir = eyes_suggested_direction(c);
@@ -121,12 +118,21 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
         }
         g->pos = new_position(g->pos, g->dir, G->nrow, G->ncol);
     } else {
-        if (!is_free_other(g->pos, G, P)) {
-            g->dir = relative_direction(G, P, g, 0);
+        struct position new = new_position(g->pos, g->dir, G->nrow, G->ncol);
+        /*struct position dir = dir_to_relative_pos(g->dir);
+        new.i += dir.i;
+        new.j += dir.j;*/
+        if (g->status == NORMAL) {
+            if (!is_free(new, G, P)) {
+                g->dir = relative_direction(G, P, g, 1);
+            }
+        } else {
+            if (!is_free_other(new, G, P)) {
+                g->dir = relative_direction(G, P, g, 0);
+            }
         }
         g->pos = new_position(g->pos, g->dir, G->nrow, G->ncol);
     }
-
 
     return g->pos;
 }
@@ -153,14 +159,16 @@ static struct position new_position(struct position pos, enum direction dir, uns
 }
 
 static int is_free(struct position pos, struct ghosts *G, struct pacman *P) {
-    if (pos.j >= G->ncol || pos.i >= G->nrow) return 1;
-    if (pos.j < 0 || pos.i < 0) return 1;
+    if (pos.j >= G->ncol || pos.i >= G->nrow) return 0;
+    if (pos.j < 0 || pos.i < 0) return 0;
+    if(IS_WALL(G->A, pos)) return 0;
+    if(IS_GHOST(G->A, pos)) return 0;
     int i;
     for (i = 0; i < G->num_ghosts; i++) {
         if ((pos.i == G->ghosts_arr[i].pos.i) && (pos.j == G->ghosts_arr[i].pos.j))
             return 0;
     }
-    return !IS_WALL(G->A, pos);
+    return 1;
 }
 
 static int is_free_other(struct position pos, struct ghosts *G, struct pacman *P) {
