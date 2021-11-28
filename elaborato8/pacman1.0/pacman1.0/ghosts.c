@@ -263,7 +263,7 @@ static enum direction relative_direction(struct ghosts *G, struct pacman *P, str
         for (y = -1; y <= 1; y++) {
             new.i = ghost_pos.i + y;
             new.j = ghost_pos.j + x;
-            if (((x && !ghost_dir.j) || (y && !ghost_dir.i)) && !(x && y) && is_free(new, G, P)) {
+            if (((x && !ghost_dir.j) || (y && !ghost_dir.i)) && !(x && y) && is_free_other(new, G, P)) {
                 double dist = distance(pacman_pos, new);
                 if (dis > dist == closest) {
                     dis = dist;
