@@ -41,6 +41,8 @@ static int is_free(struct position pos, struct ghosts *G, struct pacman *P);
 
 static int is_free_other(struct position pos, struct ghosts *G, struct pacman *P);
 
+static int can_move_side(struct ghost *ghost, struct ghosts *G, struct pacman *P);
+
 static enum direction eyes_suggested_direction(char c);
 
 /* Create the ghosts data structure */
@@ -123,11 +125,11 @@ struct position ghosts_move(struct ghosts *G, struct pacman *P, unsigned int id)
         new.i += dir.i;
         new.j += dir.j;*/
         if (g->status == NORMAL) {
-            if (!is_free(new, G, P)) {
+            if (!is_free(new, G, P) || can_move_side(g, G, P)) {
                 g->dir = relative_direction(G, P, g, 1);
             }
         } else {
-            if (!is_free_other(new, G, P)) {
+            if (!is_free_other(new, G, P) || can_move_side(g, G, P)) {
                 g->dir = relative_direction(G, P, g, 0);
             }
         }
@@ -159,8 +161,15 @@ static struct position new_position(struct position pos, enum direction dir, uns
 }
 
 static int is_free(struct position pos, struct ghosts *G, struct pacman *P) {
-    if (pos.j >= G->ncol || pos.i >= G->nrow) return 0;
-    if (pos.j < 0 || pos.i < 0) return 0;
+    if (pos.i >= G->nrow || pos.i < 0) return 0;
+    if (pos.j < 0) {
+        pos.j = G->nrow - 1;
+        return is_free(pos, G, P);
+    }
+    if (pos.j >= G->nrow) {
+        pos.j = 0;
+        return is_free(pos, G, P);
+    }
     if(IS_WALL(G->A, pos)) return 0;
     if(IS_GHOST(G->A, pos)) return 0;
     int i;
@@ -173,7 +182,11 @@ static int is_free(struct position pos, struct ghosts *G, struct pacman *P) {
 
 static int is_free_other(struct position pos, struct ghosts *G, struct pacman *P) {
     struct position pacman_pos = pacman_get_position(P);
+    enum direction pacman_dir = pacman_get_direction(P);
     if (pos.i == pacman_pos.i && pos.j == pacman_pos.j)
+        return 0;
+    struct position new_pacman_pos = new_position(pacman_pos, pacman_dir, G->nrow, G->ncol);
+    if (pos.i == new_pacman_pos.i && pos.j == new_pacman_pos.j)
         return 0;
     return is_free(pos, G, P);
 }
@@ -263,6 +276,24 @@ static enum direction relative_direction(struct ghosts *G, struct pacman *P, str
 
     struct position direction = {dir_y, dir_x};
     return relative_pos_to_dir(direction);
+}
+
+static int can_move_side(struct ghost *ghost, struct ghosts *G, struct pacman *P) {
+    if(ghost->dir == LEFT || ghost->dir == RIGHT) {
+        struct position up = ghost->pos;
+        up.i--;
+        struct position down = ghost->pos;
+        down.i++;
+        return is_free_other(up, G, P) || is_free_other(down, G, P);
+    }
+    if(ghost->dir == UP || ghost->dir == DOWN) {
+        struct position left = ghost->pos;
+        left.j--;
+        struct position right = ghost->pos;
+        right.j++;
+        return is_free_other(left, G, P) || is_free_other(right, G, P);
+    }
+    return 0;
 }
 
 #endif
