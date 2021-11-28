@@ -25,24 +25,51 @@ struct ghosts {
     struct ghost ghosts_arr[];
 };
 
+/*
+ * Calcola la distanza tra due posizioni.
+ */
 static double distance(struct position pos1, struct position pos2);
 
+/*
+ * Calcola la direzione ottimale da seguire per il fantasma.
+ * closest == 0 trova la direzione più lontana da pacman,
+ * closest == 1 trova la direzione più vicina.
+ */
 static enum direction relative_direction(struct ghosts *G, struct pacman *P, struct ghost *ghost, int closest);
 
+/*
+ * Converte la direzione in una position relativa con i e j tra -1 e 1.
+ */
 static struct position dir_to_relative_pos(enum direction dir);
 
+/*
+ * Converte la position relativa in direzione.
+ */
 static enum direction relative_pos_to_dir(struct position rel);
 
-/* returns the new position of the ghost based on its direction */
+/*
+ * Calcola la nuova posizione in base alla direzione.
+ */
 static struct position new_position(struct position pos, enum direction dir, unsigned int nrow, unsigned int ncol);
 
-/* Move the ghost id ( according to its status ). Returns the new position */
+/*
+ * Determina se la posizione è libera (pacman escluso).
+ */
 static int is_free(struct position pos, struct ghosts *G, struct pacman *P);
 
+/*
+ * Determina se la posizione è libera (pacman incluso).
+ */
 static int is_free_other(struct position pos, struct ghosts *G, struct pacman *P);
 
+/*
+ * Determina se il fantasma può muoversi lateralmente.
+ */
 static int can_move_side(struct ghost *ghost, struct ghosts *G, struct pacman *P);
 
+/*
+ * Trova la direzione da seguire per EYES.
+ */
 static enum direction eyes_suggested_direction(char c);
 
 /* Create the ghosts data structure */
@@ -167,8 +194,8 @@ static int is_free(struct position pos, struct ghosts *G, struct pacman *P) {
         pos.j = G->ncol - 1;
         return is_free(pos, G, P);
     }
-    if(IS_WALL(G->A, pos)) return 0;
-    if(IS_GHOST(G->A, pos)) return 0;
+    if (IS_WALL(G->A, pos)) return 0;
+    if (IS_GHOST(G->A, pos)) return 0;
     int i;
     for (i = 0; i < G->num_ghosts; i++) {
         if ((pos.i == G->ghosts_arr[i].pos.i) && (pos.j == G->ghosts_arr[i].pos.j))
@@ -276,14 +303,14 @@ static enum direction relative_direction(struct ghosts *G, struct pacman *P, str
 }
 
 static int can_move_side(struct ghost *ghost, struct ghosts *G, struct pacman *P) {
-    if(ghost->dir == LEFT || ghost->dir == RIGHT) {
+    if (ghost->dir == LEFT || ghost->dir == RIGHT) {
         struct position up = ghost->pos;
         up.i--;
         struct position down = ghost->pos;
         down.i++;
         return is_free_other(up, G, P) || is_free_other(down, G, P);
     }
-    if(ghost->dir == UP || ghost->dir == DOWN) {
+    if (ghost->dir == UP || ghost->dir == DOWN) {
         struct position left = ghost->pos;
         left.j--;
         struct position right = ghost->pos;
