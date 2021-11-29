@@ -74,10 +74,10 @@ static enum direction eyes_suggested_direction(char c);
 
 /* Create the ghosts data structure */
 struct ghosts *ghosts_setup(unsigned int num_ghosts) {
-    struct ghosts * G = (struct ghost *) malloc(sizeof(struct ghosts));
+    struct ghosts *G = (struct ghosts *) malloc(sizeof(struct ghosts));
     if (G != NULL) {
         G->num_ghosts = num_ghosts;
-        G->ghosts_arr = (struct ghost * ) calloc(num_ghosts, sizeof(struct ghost));
+        G->ghosts_arr = (struct ghost *) calloc(num_ghosts, sizeof(struct ghost));
 
     }
     int i;
@@ -273,7 +273,6 @@ static enum direction relative_direction(struct ghosts *G, struct pacman *P, str
     struct position ghost_pos = ghost->pos;
     struct position ghost_dir = dir_to_relative_pos(ghost->dir);
 
-    /* Posizione clonata */
     struct position new = ghost_pos;
 
     double dis = closest ? DBL_MAX : 0;
@@ -302,7 +301,9 @@ static enum direction relative_direction(struct ghosts *G, struct pacman *P, str
         }
     }
 
-    struct position direction = {dir_y, dir_x};
+    struct position direction = {0, 0};
+    direction.i = dir_y;
+    direction.j = dir_x;
     return relative_pos_to_dir(direction);
 }
 
