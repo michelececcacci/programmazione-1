@@ -8,7 +8,7 @@
 #include <math.h>
 #include <float.h>
 
-static const struct position UNK_POSITION = {-1, -1};
+static const struct position UNK_POSITION;
 
 struct ghost {
     struct position pos;
@@ -82,7 +82,11 @@ struct ghosts *ghosts_setup(unsigned int num_ghosts) {
     }
     int i;
     for (i = 0; i < num_ghosts; i++) {
-        struct ghost new_ghost = {UNK_POSITION, UNK_DIRECTION, i, UNK_GHOST_STATUS};
+        struct ghost new_ghost;
+        new_ghost.pos = UNK_POSITION; 
+        new_ghost.dir = UNK_DIRECTION; 
+        new_ghost.id = i;
+        new_ghost.status = UNK_GHOST_STATUS;
         G->ghosts_arr[i] = new_ghost;
     }
     return G;
@@ -270,7 +274,7 @@ static enum direction relative_direction(struct ghosts *G, struct pacman *P, str
     struct position ghost_dir = dir_to_relative_pos(ghost->dir);
 
     /* Posizione clonata */
-    struct position new = {ghost_pos.i, ghost_pos.j};
+    struct position new = ghost_pos;
 
     double dis = closest ? DBL_MAX : 0;
 
