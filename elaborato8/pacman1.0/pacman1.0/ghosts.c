@@ -22,7 +22,7 @@ struct ghosts {
     unsigned int nrow;
     unsigned int ncol;
     unsigned int num_ghosts;
-    struct ghost ghosts_arr[];
+    struct ghost * ghosts_arr;
 };
 
 /*
@@ -74,11 +74,12 @@ static enum direction eyes_suggested_direction(char c);
 
 /* Create the ghosts data structure */
 struct ghosts *ghosts_setup(unsigned int num_ghosts) {
-    struct ghosts *G = (struct ghosts *) malloc(sizeof(struct ghosts) + sizeof(struct ghost) * num_ghosts);
-    G->A = NULL;
-    G->nrow = 0;
-    G->ncol = 0;
-    G->num_ghosts = num_ghosts;
+    struct ghosts * G = (struct ghost *) malloc(sizeof(struct ghosts));
+    if (G != NULL) {
+        G->num_ghosts = num_ghosts;
+        G->ghosts_arr = (struct ghost * ) calloc(num_ghosts, sizeof(struct ghost));
+
+    }
     int i;
     for (i = 0; i < num_ghosts; i++) {
         struct ghost new_ghost = {UNK_POSITION, UNK_DIRECTION, i, UNK_GHOST_STATUS};
