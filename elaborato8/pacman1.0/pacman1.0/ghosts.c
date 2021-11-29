@@ -240,7 +240,7 @@ static double distance(struct position pos1, struct position pos2) {
 }
 
 static struct position dir_to_relative_pos(enum direction dir) {
-    struct position rel = {0, 0};
+    struct position rel;
     switch (dir) {
         case LEFT:
             rel.j = -1;
