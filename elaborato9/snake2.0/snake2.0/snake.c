@@ -44,7 +44,7 @@ int snake_knotted(struct snake *s) {
     struct body *head = s->body;
     struct body *body = head->next;
     unsigned int i;
-    for(i = 1; i < s->length; i++) {
+    for(i = 0; i < s->length; i++) {
         if(head->pos.i == body->pos.i && head->pos.j == body->pos.j) {
             return 1;
         }
@@ -59,6 +59,19 @@ void snake_move(struct snake *s, enum direction dir) {
 }
 
 void snake_reverse(struct snake *s) {
+    printf("\n\nTEST l=%d\n", s->length);
+    struct body *body = s->body; /* body_at(s, s->length - 1); */
+    unsigned int i;
+    for(i = 0; i < s->length - 1; i++) {
+        printf("%d ", i);
+        if(body == NULL) break;
+        struct body *old_next = body->next;
+        if(old_next == NULL) continue;
+        printf("pos=[%d, %d]\n", body->pos.i, body->pos.j);
+        body->next = body->prev;
+        body->prev = old_next;
+        body = old_next;
+    }
 }
 
 void snake_increase(struct snake *s, enum direction dir) {
