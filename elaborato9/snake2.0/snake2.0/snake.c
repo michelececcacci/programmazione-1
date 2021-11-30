@@ -12,6 +12,8 @@ static struct body *body_at(struct snake *s, unsigned int index);
  */
 static struct position dir_to_relative_pos(enum direction dir);
 
+static struct position shift_pos(struct position pos, enum direction dir, unsigned int rows, unsigned int cols);
+
 struct snake *snake_create(unsigned int rows, unsigned int cols) {
     struct snake *snake = malloc(sizeof *snake);
     snake->rows = rows;
@@ -78,10 +80,10 @@ void snake_increase(struct snake *s, enum direction dir) {
     struct body *old_head = s->body;
     struct body *new_head = malloc(sizeof *new_head);
 
-    struct position relative_dir = dir_to_relative_pos(dir);
     struct position pos;
-    pos.i = old_head->pos.i + relative_dir.i;
-    pos.j = old_head->pos.j + relative_dir.j;
+    pos.i = old_head->pos.i;
+    pos.j = old_head->pos.j;
+    pos = shift_pos(pos, dir, s->rows, s->cols);
     new_head->pos = pos;
 
     s->body = new_head;
@@ -135,4 +137,22 @@ static struct position dir_to_relative_pos(enum direction dir) {
             break;
     }
     return rel;
+}
+
+static struct position shift_pos(struct position pos, enum direction dir, unsigned int rows, unsigned int cols) {
+    switch (dir) {
+        case LEFT:
+            pos.j = (pos.j - 1 +  cols) % cols;
+            break;
+        case RIGHT:
+            pos.j = (pos.j + 1 +  cols) % cols;
+            break;
+        case UP:
+            pos.i = (pos.i - 1 + rows) % rows;
+            break;
+        case DOWN:
+            pos.i = (pos.i + 1 + rows) % rows;
+            break;
+    }
+    return pos;
 }
