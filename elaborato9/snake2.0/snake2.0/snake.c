@@ -59,11 +59,11 @@ void snake_move(struct snake *s, enum direction dir) {
 }
 
 void snake_reverse(struct snake *s) {
-    printf("\n\nTEST l=%d\n", s->length);
+    /*printf("\n\nTEST l=%d\n", s->length);*/
     struct body *body = s->body; /* body_at(s, s->length - 1); */
     unsigned int i;
     for(i = 0; i < s->length - 1; i++) {
-        printf("%d ", i);
+        /*printf("%d ", i);*/
         if(body == NULL) break;
         struct body *old_next = body->next;
         if(old_next == NULL) continue;
@@ -98,12 +98,30 @@ void snake_decrease(struct snake *s, unsigned int decrease_len) {
 
 /* Saves the snake into the filename. */
 void snake_save(struct snake *s, char *filename) {
-    
+    FILE *fp;    
+    int i ;
+    fp = fopen(filename, 'w');
+    struct body * current = s->body;
+    fprintf(fp, "%d,%d,%\n", s->length, s->rows, s->cols);
+    for (i = 0; i < s->length; i++){
+        fprintf(fp, "%d,%d\n", current->pos.i, current->pos.j);
+        current = current->next;
+    }
+    fclose(fp);
 }
 
 /* Loads the snake from filename */
 struct snake *snake_read(char *filename) {
-    return snake_create(10, 10); /* test */
+    struct snake s;
+    FILE *fp = fopen(filename, "r");
+    struct body b;
+    int buffer_length = 255;
+    char buffer[buffer_length];
+    fscanf("%d,%d,%d", s.length, s.rows, s.cols);
+    while (fgets(buffer, buffer_length, fp)){
+         fscanf("%d,%d", b.pos.i, b.pos.j, fp);
+    }
+    fclose(fp);
 }
 
 static struct body *body_at(struct snake *s, unsigned int index) {
