@@ -45,6 +45,8 @@ int snake_knotted(struct snake *s) {
 }
 
 void snake_move(struct snake *s, enum direction dir) {
+    snake_increase(s, dir);
+    snake_decrease(s, 1);
 }
 
 void snake_reverse(struct snake *s) {
