@@ -2,6 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/*
+ * Ottiene la parte dello snake all'index dato
+ */
+static struct body *body_at(struct snake *s, unsigned int index);
 
 struct snake *snake_create(unsigned int rows, unsigned int cols) {
     struct snake *snake = malloc(sizeof *snake);
@@ -23,14 +27,11 @@ void snake_kill(struct snake *s) {
 }
 
 struct position snake_head(struct snake *s) {
-	struct position p;
-	return p;
-
+	return s->body->pos;
 }
 
 struct position snake_body(struct snake *s, unsigned int i) {
-	struct position p;
-	return p;
+    return body_at(s, i)->pos;
 }
 
 int snake_knotted(struct snake *s) {
@@ -58,4 +59,13 @@ void snake_save(struct snake *s, char *filename) {
 /* Loads the snake from filename */
 struct snake *snake_read(char *filename) {
     return snake_create(10, 10); /* test */
+}
+
+static struct body *body_at(struct snake *s, unsigned int index) {
+    struct body *body = s->body;
+    unsigned int i;
+    for(i = 0; i < index; i++) {
+        body = body->next;
+    }
+    return body;
 }
