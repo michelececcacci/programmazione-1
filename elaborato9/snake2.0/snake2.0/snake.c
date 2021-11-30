@@ -8,10 +8,8 @@
 static struct body *body_at(struct snake *s, unsigned int index);
 
 /*
- * Converte la direzione in una position relativa con i e j tra -1 e 1.
+ * Effettua un movimento (shift) verso una direzione applicando il warping nei bordi
  */
-static struct position dir_to_relative_pos(enum direction dir);
-
 static struct position shift_pos(struct position pos, enum direction dir, unsigned int rows, unsigned int cols);
 
 struct snake *snake_create(unsigned int rows, unsigned int cols) {
@@ -115,28 +113,6 @@ static struct body *body_at(struct snake *s, unsigned int index) {
         body = body->next;
     }
     return body;
-}
-
-static struct position dir_to_relative_pos(enum direction dir) {
-    struct position rel;
-    rel.i = 0;
-    rel.j = 0;
-
-    switch (dir) {
-        case LEFT:
-            rel.j = -1;
-            break;
-        case RIGHT:
-            rel.j = 1;
-            break;
-        case UP:
-            rel.i = -1;
-            break;
-        case DOWN:
-            rel.i = 1;
-            break;
-    }
-    return rel;
 }
 
 static struct position shift_pos(struct position pos, enum direction dir, unsigned int rows, unsigned int cols) {
