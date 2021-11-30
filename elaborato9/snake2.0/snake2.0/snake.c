@@ -42,12 +42,13 @@ struct position snake_body(struct snake *s, unsigned int i) {
 
 int snake_knotted(struct snake *s) {
     struct body *head = s->body;
+    struct body *body = head->next;
     unsigned int i;
     for(i = 1; i < s->length; i++) {
-        struct body *body = body_at(s, i);
         if(head->pos.i == body->pos.i && head->pos.j == body->pos.j) {
             return 1;
         }
+        body = body->next;
     }
 	return 0;
 }
