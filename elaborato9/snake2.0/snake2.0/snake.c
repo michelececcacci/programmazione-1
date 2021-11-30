@@ -1,12 +1,25 @@
 #include "snake.h" 
 #include <stdio.h>
+#include <stdlib.h>
 
 
 struct snake *snake_create(unsigned int rows, unsigned int cols) {
-  return NULL;
-} 
+    struct snake *snake = malloc(sizeof *snake);
+    snake->rows = rows;
+    snake->cols = cols;
+    snake->length = 1;
 
-void snake_kill(struct snake *s) {	
+    struct body *body = malloc(sizeof *body);
+    struct position pos;
+    pos.i = rand() % rows;
+    pos.j = rand() % cols;
+    body->pos = pos;
+    snake->body = body;
+    return snake;
+}
+
+void snake_kill(struct snake *s) {
+    free(s);
 }
 
 struct position snake_head(struct snake *s) {
@@ -44,5 +57,5 @@ void snake_save(struct snake *s, char *filename) {
 
 /* Loads the snake from filename */
 struct snake *snake_read(char *filename) {
-    return NULL;    
+    return snake_create(10, 10); /* test */
 }
