@@ -190,10 +190,8 @@ static int split_str(char *input, char **output, char *separator) {
     temp = strtok(input, separator);
 
     for(int i = 0; temp != NULL; i++) {
-        if(strcmp(temp, "\n")) {
-            size++;
-            output[i] = temp;
-        }
+        size++;
+        output[i] = temp;
         temp = strtok(NULL, separator);
     }
     return size;
