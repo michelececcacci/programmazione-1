@@ -70,19 +70,14 @@ void snake_move(struct snake *s, enum direction dir) {
 }
 
 void snake_reverse(struct snake *s) {
-    /*printf("\n\nTEST l=%d\n", s->length);*/
-    struct body *body = s->body; /* body_at(s, s->length - 1); */
-    unsigned int i;
-    for(i = 0; i < s->length - 1; i++) {
-        /*printf("%d ", i);*/
-        if(body == NULL) break;
-        struct body *old_next = body->next;
-        if(old_next == NULL) continue;
-        printf("pos=[%d, %d]\n", body->pos.i, body->pos.j);
-        body->next = body->prev;
-        body->prev = old_next;
-        body = old_next;
-    }
+   struct body* current = s->body, *prev = NULL, *next; 
+   while (current != NULL){
+       next = current->next;
+       current->next = prev;
+       prev = current;  
+       current =  next;
+   }
+   s->body = prev;
 }
 
 void snake_increase(struct snake *s, enum direction dir) {
@@ -185,11 +180,10 @@ static struct position shift_pos(struct position pos, enum direction dir, unsign
 }
 
 static int split_str(char *input, char **output, char *separator) {
-    int size = 0;
+    int size = 0, i;
     char *temp;
     temp = strtok(input, separator);
-
-    for(int i = 0; temp != NULL; i++) {
+    for(i = 0; temp != NULL; i++) {
         size++;
         output[i] = temp;
         temp = strtok(NULL, separator);
