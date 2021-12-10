@@ -76,6 +76,7 @@ void snake_move(struct snake *s, enum direction dir) {
 }
 
 void snake_reverse(struct snake *s) {
+   snake_save(s, "snake_normal.log");
    struct body* current = s->body, *prev = NULL, *next; 
    while (current != NULL){
        next = current->next;
@@ -84,6 +85,7 @@ void snake_reverse(struct snake *s) {
        current =  next;
    }
    s->body = prev;
+   snake_save(s, "snake_reversed.log");
 }
 
 void snake_increase(struct snake *s, enum direction dir) {
@@ -115,10 +117,11 @@ void snake_save(struct snake *s, char *filename) {
     struct body *current = s->body;
     fprintf(fp, "%u %u %u\n", s->length, s->rows, s->cols);
     unsigned int i;
-    for (i = 0; i < s->length; i++){
+    while (current->next != NULL) {
         fprintf(fp, "%d %d\n", current->pos.i, current->pos.j);
         current = current->next;
     }
+    fprintf(fp, "%d %d\n", current->pos.i, current->pos.j);
     fclose(fp);
 }
 
