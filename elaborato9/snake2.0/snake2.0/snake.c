@@ -22,12 +22,12 @@ struct snake *snake_create(unsigned int rows, unsigned int cols) {
     e ricorda di togliere il commento in knotted
     struct snake *s = snake_read("test.txt");
     return s;*/
-    struct snake *snake = malloc(sizeof *snake);
+    struct snake *snake = malloc(sizeof (struct snake));
     snake->rows = rows;
     snake->cols = cols;
     snake->length = 1;
 
-    struct body *body = malloc(sizeof *body);
+    struct body *body = malloc(sizeof (struct body));
     struct position pos;
     pos.i = rand() % rows;
     pos.j = rand() % cols;
@@ -128,7 +128,7 @@ void snake_save(struct snake *s, char *filename) {
 
 /* Loads the snake from filename */
 struct snake *snake_read(char *filename) {
-    struct snake *s = malloc(sizeof *s);
+    struct snake *s = malloc(sizeof(struct snake));
     struct body *current = NULL;
     FILE *fp = fopen(filename, "r");
 
@@ -142,7 +142,7 @@ struct snake *snake_read(char *filename) {
             s->rows = strtoi(split[1]);
             s->cols = strtoi(split[2]);
         } else {
-            struct body *body = malloc(sizeof *body);
+            struct body *body = malloc(sizeof (struct body));
             struct position pos;
             pos.i = strtoi(split[0]);
             pos.j = strtoi(split[1]);
