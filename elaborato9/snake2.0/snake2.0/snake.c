@@ -38,6 +38,12 @@ struct snake *snake_create(unsigned int rows, unsigned int cols) {
 }
 
 void snake_kill(struct snake *s) {
+    struct body * current = s->body;
+    while (current->next != NULL){
+        current = current->next;
+        free(current->prev);
+    }
+    free(current);
     free(s);
 }
 
@@ -53,8 +59,8 @@ int snake_knotted(struct snake *s) {
     struct body *head = s->body;
     struct body *body = head->next;
     unsigned int i;
-    for(i = 0; i < s->length; i++) {
-        if(head->pos.i == body->pos.i && head->pos.j == body->pos.j) {
+    for (i = 0; i < s->length; i++) {
+        if (head->pos.i == body->pos.i && head->pos.j == body->pos.j) {
             /* togli il commento per salvare
             snake_save(s, "test.txt");*/
             return 1;
