@@ -18,10 +18,6 @@ static int split_str(char *input, char **output, char *separator);
 static unsigned int strtoi(char *input);
 
 struct snake *snake_create(unsigned int rows, unsigned int cols) {
-    /* togli il commento per caricare da read
-    e ricorda di togliere il commento in knotted
-    struct snake *s = snake_read("test.txt");
-    return s;*/
     struct snake *snake = malloc(sizeof (struct snake));
     snake->rows = rows;
     snake->cols = cols;
@@ -57,18 +53,14 @@ struct position snake_body(struct snake *s, unsigned int i) {
 }
 
 int snake_knotted(struct snake *s) {
-    struct body *head = s->body;
-    struct body *body = head->next;
+    struct body *current = s->body->next;
     unsigned int i;
-    for (i = 0; i < s->length; i++) {
-        if (head->pos.i == body->pos.i && head->pos.j == body->pos.j) {
-            /* togli il commento per salvare
-            snake_save(s, "test.txt");*/
+    while (current != NULL) {
+        if ((s->body->pos.i == current->pos.i) && (s->body->pos.j == current->pos.j)) {
             return 1;
         }
-        body = body->next;
+        current = current->next;
     }
-	return 0;
 }
 
 void snake_move(struct snake *s, enum direction dir) {
