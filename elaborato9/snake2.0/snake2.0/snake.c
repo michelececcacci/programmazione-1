@@ -38,10 +38,11 @@ struct snake *snake_create(unsigned int rows, unsigned int cols) {
 }
 
 void snake_kill(struct snake *s) {
-    struct body * current = s->body;
+    struct body * current = s->body, *tmp;
     while (current->next != NULL){
+        tmp = current;
         current = current->next;
-        free(current->prev);
+        free(tmp);
     }
     free(current);
     free(s);
