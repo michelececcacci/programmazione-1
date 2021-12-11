@@ -15,6 +15,9 @@ static struct position shift_pos(struct position pos, enum direction dir, unsign
 
 static int split_str(char *input, char **output, char *separator);
 
+/* checks if two positions have the same coordinates */
+static int same_positions(struct position pos1, struct position pos2);
+
 static unsigned int strtoi(char *input);
 
 struct snake *snake_create(unsigned int rows, unsigned int cols) {
@@ -34,11 +37,11 @@ struct snake *snake_create(unsigned int rows, unsigned int cols) {
 }
 
 void snake_kill(struct snake *s) {
-    struct body *current = s->body, *tmp;
+    struct body *current = s->body, *temporary;
     while (current->next != NULL) {
-        tmp = current;
+        temporary = current;
         current = current->next;
-        free(tmp);
+        free(temporary);
     }
     free(current);
     free(s);
@@ -55,7 +58,7 @@ struct position snake_body(struct snake *s, unsigned int i) {
 int snake_knotted(struct snake *s) {
     struct body *current = s->body->next;
     while (current != NULL) {
-        if ((s->body->pos.i == current->pos.i) && (s->body->pos.j == current->pos.j)) {
+        if (same_positions(s->body->pos, current->pos)) {
             return 1;
         }
         current = current->next;
@@ -69,15 +72,16 @@ void snake_move(struct snake *s, enum direction dir) {
 }
 
 void snake_reverse(struct snake *s) {
-    struct body *tmp = NULL;
+    struct body *temporary = NULL;
     struct body *current = s->body;
     while (current != NULL) {
-        tmp = current->prev;           /* saving the previous node */
-        current->prev = current->next; /* assigning at the previous node the next one */
-        current->next = tmp;           /* assigning at the next node the vale of the previous one */
-        current = current->prev;       /* the current become the next node (to keep on the loop) */
+        temporary = current->prev;           
+        current->prev = current->next; 
+        current->next = temporary;           
+        current = current->prev;       
     }
-    if (tmp != NULL) s->body = tmp->prev;
+    if (temporary != NULL) 
+        s->body = temporary->prev;
 }
 
 
@@ -201,4 +205,8 @@ static int split_str(char *input, char **output, char *separator) {
 static unsigned int strtoi(char *input) {
     char *end;
     return strtol(input, &end, 10);
+}
+
+static int same_positions(struct position pos1, struct position pos2){
+    return pos1.i == pos2.i && pos1.j == pos2.j;
 }
