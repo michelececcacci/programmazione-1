@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-#include <curses.h>
+#include "curses.h"
 #include "display.h"
 
 static void display_timeout(struct world *W);
