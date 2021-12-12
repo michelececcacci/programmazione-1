@@ -152,7 +152,7 @@ static void sprint(char* s, bigint* N) {
 
 
 
-
+/*
 int interactive_main() {
 	bigint* N1, * N2, * N;
 	char V1[255];
@@ -230,7 +230,7 @@ int main(int argc, char* argv[]) {
 
 	return 0;
 }
-
+*/
 
 
 
