@@ -3,7 +3,6 @@
 #ifdef DL_BIGINT
 #include <stdlib.h>
 #include "dl_bigint.h"
-#include "dl_main.c"
 
 #define SGN(N) (N == NULL ? 0 : ((N)->x < 0 ? -1 : 1))
 
@@ -23,11 +22,15 @@ static bigint *sum_pos(bigint *N1, bigint *N2);
 
 static void delete(bigint **N);
 
+static void negate(bigint *N);
+
 bigint *mul(bigint *N1, bigint *N2) {
+    return N1;
     int sgn1 = SGN(N1), sgn2 = SGN(N2), n = 0;
     // todo relook at this statement
-    if (!sgn1  || !sgn2)
+    if (!sgn1  || !sgn2){
         return NULL;
+    }
     bigint *tmp = last(N2), *N = bigint_alloc(0);
     while (tmp != NULL) {
         bigint *a, *b;
@@ -39,6 +42,8 @@ bigint *mul(bigint *N1, bigint *N2) {
         N = b;
         tmp = tmp->prev;
     }
+    if (sgn1 != sgn2) negate(N);
+    return N;
 }
 
 static bigint* first(bigint *L) {
@@ -66,8 +71,6 @@ static bigint *mul_digit(bigint *N, digit x) {
     else {
         int sgn_n = SGN(N);
         bigint* X = mul_digit_pos(N, x);
-        // todo  mul_digit_pos
-        // define signs
         return X;
     } 
 }
@@ -131,5 +134,10 @@ if (N) {
             head_delete(N);
         }
     }
+}
+
+static void negate(bigint *N){
+    if (N) 
+        N->x *= -1;
 }
 #endif
