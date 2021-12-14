@@ -133,6 +133,7 @@ struct snake *snake_read(char *filename) {
     struct snake *s = malloc(sizeof(struct snake));
     struct body *current = NULL;
     FILE *fp = fopen(filename, "r");
+    if (!fp) return;
 
     int line = 0;
     char buffer[255];
