@@ -8,6 +8,7 @@
 static long int value_from_list(bigint *L);
 static bigint* first(bigint *L);
 static bigint* last(bigint *L);
+static bigint* sum(bigint *N1, bigint *N12);
 
 bigint *mul(bigint *N1, bigint *N2) {
     /* I risultati delle linee delle moltiplicazioni in colonna */
@@ -20,14 +21,14 @@ bigint *mul(bigint *N1, bigint *N2) {
     int i;
     for (i = 0; n2_current != NULL; i++) {
         /* La cifra del secondo numero */
-        int n2_digit = (int) n2_current->x;
+        digit n2_digit = n2_current->x;
         n2_current = n2_current->prev;
         while (n1_current != NULL) {
             /* La cifra del primo numero */
-            int n1_digit = (int) n1_current->x;
+            digit n1_digit = n1_current->x;
             /* Il nodo attuale */
             bigint *mul = (bigint*) malloc(sizeof(bigint));
-            signed char result = (signed char) (n1_digit * n2_digit);
+            digit result = (digit) (n1_digit * n2_digit);
             bigint *res = i == 0 ? line1 : line2;
 
             res->x = result;
@@ -52,12 +53,14 @@ bigint *mul(bigint *N1, bigint *N2) {
     final_zero->prev = line2;
     line2->next = final_zero;
 
+    printf("L1 ");
     print(first(line1));
     printf("\n");
+    printf("L1 ");
     print(first(line2));
     printf("\n");
 
-    return NULL;
+    return sum(line1, line2);
 }
 
 static bigint* first(bigint *L) {
@@ -74,6 +77,30 @@ static bigint* last(bigint *L) {
         if(current->next == NULL) return current;
         current = current->next;
     }
+}
+
+static bigint* sum(bigint *N1, bigint *N2) {
+    bigint *result = (bigint*) malloc(sizeof (bigint));
+    N1 = last(N1);
+    printf("a ");
+    print(N1);
+    printf("\n");
+    N2 = last(N2);
+    while (N2 != NULL) {
+        digit n2_digit = N2->x;
+        while (N1 != NULL) {
+            digit n1_digit = N1->x;
+            bigint *sum = (bigint*) malloc(sizeof(bigint));
+            sum->x = (digit) (n1_digit + n2_digit);
+            printf("%d + %d\n", n1_digit, n2_digit);
+            result->prev = sum;
+            sum->next = result;
+            result = sum;
+            N1 = N1->prev;
+        }
+        N2 = N2->prev;
+    }
+    return result;
 }
 
 #endif
