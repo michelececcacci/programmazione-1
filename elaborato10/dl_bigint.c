@@ -87,11 +87,8 @@ static void remove_leading_zeros(bigint** N) {
 }
 
 bigint *mul(bigint *N1, bigint *N2) {
-    return N1;
     int sgn1 = SGN(N1), sgn2 = SGN(N2), n = 0;
-    if (!sgn1  || !sgn2){
-        return NULL;
-    }
+    if (!sgn1 || !sgn2) return NULL;
     bigint *tmp = last(N2), *N = bigint_alloc(0);
     while (tmp != NULL) {
         bigint *a, *b;
@@ -105,7 +102,6 @@ bigint *mul(bigint *N1, bigint *N2) {
     }
     if (sgn1 != sgn2) negate(N);
     return N;
-	return NULL;
 }
 
 static bigint* first(bigint *L) {
@@ -141,8 +137,11 @@ static bigint *mul_digit_pos(bigint *N, digit x) {
     bigint *X= NULL;
     int val = 0, car = 0; 
     N = last(N);
-    while (N || car){
+    while (N != NULL || car != 0){
         val = (N ? N->x : 0) * x + car;
+        car = val / 10;
+        val = val % 10;
+        head_insert(&X, val);
         N = N ? N->prev : NULL;
     }
     return X;
