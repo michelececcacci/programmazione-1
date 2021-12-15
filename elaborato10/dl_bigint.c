@@ -119,7 +119,6 @@ static bigint* last(bigint *L) {
 }
 
 static bigint *mul_digit(bigint *N, digit x) {
-    // could be wrong
     if (!N || x > 9 || x < -9)  {
         return NULL;
     }
@@ -127,8 +126,8 @@ static bigint *mul_digit(bigint *N, digit x) {
         return bigint_alloc(0);
     }
     else {
-        int sgn_n = SGN(N);
-        bigint* X = mul_digit_pos(N, x);
+        N->x = abs(N->x);
+        bigint* X = mul_digit_pos(N, abs(x));
         return X;
     } 
 }
