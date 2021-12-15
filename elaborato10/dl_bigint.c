@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "selector.h"
 #ifdef DL_BIGINT
 #include <stdlib.h>
@@ -24,10 +23,72 @@ static void delete(bigint **N);
 
 static void negate(bigint *N);
 
+static bigint* bigint_alloc(digit x) {
+	bigint* tmp = (bigint*)malloc(sizeof(bigint));
+
+	if (tmp != NULL) {
+		tmp->x = x;
+		tmp->next = NULL;
+		tmp->prev = NULL;
+	}
+	return tmp;
+}
+
+static int bigint_delete(bigint* N) {
+	if (N == NULL) {
+		return 1;
+	}
+	else {
+		if (N->next != NULL)
+			N->next->prev = N->prev;
+		if (N->prev != NULL)
+			N->prev->next = N->next;
+		free(N);
+		return 0;
+	}
+}
+
+static int head_insert(bigint** N, digit x) {
+	if (N == NULL) {
+		return 1;
+	}
+	else if (*N == NULL) {
+		return (*N = bigint_alloc(x)) == NULL;
+	}
+	else {
+		bigint* tmp = bigint_alloc(x);
+
+		if (tmp != NULL) {
+			tmp->next = *N;
+			(*N)->prev = tmp;
+			*N = tmp;
+		}
+		return tmp == NULL;
+	}
+}
+
+static int head_delete(bigint** N) {
+	if (N == NULL || *N == NULL) {
+		return 1;
+	}
+	else {
+		bigint* tmp = *N;
+
+		*N = (*N)->next;
+		return bigint_delete(tmp);
+	}
+}
+
+static void remove_leading_zeros(bigint** N) {
+	if (N != NULL) {
+		while (*N != NULL && (*N)->x == 0 && (*N)->next != NULL)
+			head_delete(N);
+	}
+}
+
 bigint *mul(bigint *N1, bigint *N2) {
     return N1;
     int sgn1 = SGN(N1), sgn2 = SGN(N2), n = 0;
-    // todo relook at this statement
     if (!sgn1  || !sgn2){
         return NULL;
     }
@@ -44,6 +105,7 @@ bigint *mul(bigint *N1, bigint *N2) {
     }
     if (sgn1 != sgn2) negate(N);
     return N;
+	return NULL;
 }
 
 static bigint* first(bigint *L) {
