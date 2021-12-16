@@ -6,13 +6,12 @@
 
 #define SGN(N) (N == NULL ? 0 : ((N)->x < 0 ? -1 : 1))
 
-static bigint* first(bigint *L);
 
 static bigint* last(bigint *L, bigint *head_node);
 
-static bigint *mul_digit(bigint *N, digit x, bigint *tail); 
+static bigint *mul_digit(bigint *N, digit x, bigint *head,bigint *tail);
 
-static bigint *mul_digit_pos(bigint *N, digit x, bigint *tail) ;
+static bigint *mul_digit_pos(bigint *N, digit x, bigint *head,bigint *tail);
 
 static void add_zeros(bigint *N, unsigned int n, bigint *tail); 
 
@@ -80,7 +79,7 @@ static int head_delete(bigint** N) {
 	}
 }
 
-static void remove_leading_zeros(bigint** N) {
+static void remove_leading_zeros(bigint** N, bigint * tail) {
 	if (N != NULL) {
 		while (*N != NULL && (*N)->x == 0 && (*N)->next != NULL)
 			head_delete(N);
@@ -88,12 +87,14 @@ static void remove_leading_zeros(bigint** N) {
 }
 
 bigint *mul(bigint *N1, bigint *N2) {
-    int sgn1 = SGN(N1), sgn2 = SGN(N2), n = 0, tail2 = last(N2, N2), tail1 = last(N1, N1);
+    int sgn1 = SGN(N1), sgn2 = SGN(N2), n = 0;
+    bigint *tail2 = last(N2, N2), *tail1 = last(N1, N1), *n1_head = N1;
     if (!sgn1 || !sgn2) return NULL;
     bigint *tmp = last(N2, tail2), *N = bigint_alloc(0);
-    while (tmp != NULL) {
+    while (tmp != tail2) {
         bigint *a, *b;
-        a = mul_digit(N1, tmp->x, tail1);
+        // todo maybe i should save the n1 value here
+        a = mul_digit(N1, tmp->x, n1_head,tail1);
         add_zeros(a, n++, tail1);
         b = sum_pos(N, a, tail1, tail2);
         delete(&N);
@@ -105,13 +106,6 @@ bigint *mul(bigint *N1, bigint *N2) {
     return N;
 }
 
-static bigint* first(bigint *L) {
-    while (L->prev) {
-        L  = L->prev; 
-    }
-    return L;
-}
-
 static bigint* last(bigint *L, bigint *head_node) {
     while (L->next != head_node){
         L = L->next;
@@ -119,7 +113,7 @@ static bigint* last(bigint *L, bigint *head_node) {
     return L;
 }
 
-static bigint *mul_digit(bigint *N, digit x, bigint *tail) {
+static bigint *mul_digit(bigint *N, digit x, bigint *head,bigint *tail) {
     if (!N || x > 9 || x < -9)  {
         return NULL;
     }
@@ -128,16 +122,17 @@ static bigint *mul_digit(bigint *N, digit x, bigint *tail) {
     }
     else {
         N->x = abs(N->x);
-        bigint* X = mul_digit_pos(N, abs(x), tail);
+        bigint* X = mul_digit_pos(N, abs(x), head, tail);
         return X;
     } 
 }
 
-static bigint *mul_digit_pos(bigint *N, digit x, bigint *tail) {
+// todo seems like there is an error here, causing the loop to not work correctly
+static bigint *mul_digit_pos(bigint *N, digit x, bigint *head,bigint *tail) {
     bigint *X= NULL;
     int val = 0, car = 0; 
-    N = tail;
-    while (N != NULL || car != 0){
+    N = last(N, head);
+    while (N != head|| car != 0){
         val = (N ? N->x : 0) * x + car;
         car = val / 10;
         val = val % 10;
@@ -165,7 +160,7 @@ static int tail_insert(bigint **N, digit x, bigint *tail) {
     else {
         bigint *tmp = tail;
         tmp->next = bigint_alloc(x);
-        if (tmp->next)
+        if (tmp->next != tail)
             tmp->next->prev = tmp;
         return tmp->next != NULL;
     }
