@@ -38,52 +38,61 @@ static int bigint_delete(bigint* N) {
 	if (N == NULL) {
 		return 1;
 	}
-	else {
-		if (N->next != NULL)
-			N->next->prev = N->prev;
-		if (N->prev != NULL)
-			N->prev->next = N->next;
-		free(N);
-		return 0;
-	}
+    else {
+        bigint *prv = N->prev, *nxt = N->next;
+        nxt->prev = prv;
+        prv->next = nxt;
+        free(N);
+        return 0;
+    }
+}
+
+static int bigint_insert(bigint *N, digit x){
+    if (N == NULL){
+        return 1;
+    }
+    else {
+        bigint *tmp = bigint_alloc(x), *nxt = N->next, *prv = N;
+        if (tmp != NULL) {
+            tmp->prev = prv;
+            tmp->next = nxt;
+            prv->next = tmp;
+            nxt->prev = tmp;
+        }
+        return tmp == NULL;
+    }
 }
 
 static int head_insert(bigint** N, digit x) {
-	if (N == NULL) {
-		return 1;
-	}
-	else if (*N == NULL) {
-		return (*N = bigint_alloc(x)) == NULL;
-	}
-	else {
-		bigint* tmp = bigint_alloc(x);
-
-		if (tmp != NULL) {
-			tmp->next = *N;
-			(*N)->prev = tmp;
-			*N = tmp;
-		}
-		return tmp == NULL;
-	}
+    if (N == NULL)
+        return 1;
+    else if (*N == NULL) 
+        return ((*N = bigint_alloc(x)) == NULL);
+    else if(bigint_insert((*N)->prev, x) == 1)
+        return 1;
+    else 
+        return ((*N = (*N)->prev) == NULL);
 }
 
 static int head_delete(bigint** N) {
 	if (N == NULL || *N == NULL) {
 		return 1;
 	}
-	else {
-		bigint* tmp = *N;
-
-		*N = (*N)->next;
-		return bigint_delete(tmp);
-	}
+    else if (*N == (*N)->next) {
+        free(*N);
+        *N = NULL;
+        return 0;
+    } else {
+        *N = (*N)->next;
+        return bigint_delete((*N)->prev);
+    }
 }
 
-static void remove_leading_zeros(bigint** N, bigint * tail) {
-	if (N != NULL) {
-		while (*N != NULL && (*N)->x == 0 && (*N)->next != NULL)
-			head_delete(N);
-	}
+static void remove_leading_zeros(bigint** N) {
+	if (N != NULL && *N != NULL) {
+        while ((*N)->x == 0 && *N !=(*N)->next)
+            head_delete(N);
+    }
 }
 
 bigint *mul(bigint *N1, bigint *N2) {
@@ -93,7 +102,6 @@ bigint *mul(bigint *N1, bigint *N2) {
     bigint *tmp = last(N2, tail2), *N = bigint_alloc(0);
     while (tmp != tail2) {
         bigint *a, *b;
-        // todo maybe i should save the n1 value here
         a = mul_digit(N1, tmp->x, n1_head,tail1);
         add_zeros(a, n++, tail1);
         b = sum_pos(N, a, tail1, tail2);
