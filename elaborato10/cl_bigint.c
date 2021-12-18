@@ -175,8 +175,6 @@ static int tail_insert(bigint **N, digit x, bigint *tail) {
 
 static bigint *sum_pos(bigint *N1, bigint *N2) {
     bigint *N = NULL;
-    if (SGN(N1) > 0 && SGN(N2) > 0) {
-        int val = 0, car = 0;;
         bigint *head1 = N1,  *head2 = N2;
         N1 = N1->prev;
         N2 = N2->prev;
@@ -186,8 +184,7 @@ static bigint *sum_pos(bigint *N1, bigint *N2) {
             val = val % 10;
             head_insert(&N, val);
             N1 = N1 != NULL && N1 != head1 ? N1->prev: NULL;
-            N1 = N1 != NULL && N1 != head2 ? N1->prev: NULL;
-        }
+            N2 = N2 != NULL && N2 != head2 ? N2->prev: NULL;
     }
     return N;
 }
