@@ -5,9 +5,9 @@
 
 
 
-bigint *mul(bigint *N1, bigint *N2) {
+/*bigint *mul(bigint *N1, bigint *N2) {
 	
 	return NULL;
-}
+}*/
 
 #endif

@@ -11,13 +11,13 @@ static bigint* last(bigint *L, bigint *head_node);
 
 static bigint *mul_digit(bigint *N, digit x, bigint *head,bigint *tail);
 
-static bigint *mul_digit_pos(bigint *N, digit x, bigint *head,bigint *tail);
+static bigint *mul_digit_pos(bigint *N, digit x);
 
 static void add_zeros(bigint *N, unsigned int n, bigint *tail); 
 
 static int tail_insert(bigint **N, digit x, bigint *tail);
 
-static bigint *sum_pos(bigint *N1, bigint *N2, bigint *tail1, bigint *tail2);
+static bigint *sum_pos(bigint *N1, bigint *N2);
 
 static void delete(bigint **N);
 
@@ -100,17 +100,16 @@ bigint *mul(bigint *N1, bigint *N2) {
     bigint  *n1_head = N1, *n2_head = N2, *tail2 = last(N2, n2_head), *tail1 = last(N1, N1);
     if (!sgn1 || !sgn2) return NULL;
     bigint *tmp = last(N2, tail2), *N = bigint_alloc(0);
-    while (tmp != n2_head) {
+    while (tmp != n2_head){ 
         bigint *a, *b;
         a = mul_digit(N1, tmp->x, n1_head, tail1);
         add_zeros(a, n++, tail1);
-        b = sum_pos(N, a, tail1, tail2);
-        // maybe check delete ?
+        b = sum_pos(N, a);
         delete(&N);
         delete(&a);
         N = b;
         tmp = tmp->prev;
-    }
+    } 
     if (sgn1 != sgn2) negate(N);
     return N;
 }
@@ -131,21 +130,22 @@ static bigint *mul_digit(bigint *N, digit x, bigint *head,bigint *tail) {
     }
     else {
         N->x = abs(N->x);
-        bigint* X = mul_digit_pos(N, abs(x), head, tail);
+        bigint* X = mul_digit_pos(N, abs(x));
         return X;
     } 
 }
 
-static bigint *mul_digit_pos(bigint *N, digit x, bigint *head, bigint *tail) {
+static bigint *mul_digit_pos(bigint *N, digit x) {
     bigint *X = NULL;
     int val = 0, car = 0; 
-    N = last(N, head);
-    while ((N != head && N != NULL) || car != 0){
+    bigint *head = N;
+    N = N->prev;
+    while ((N != NULL) || car != 0){
         val = (N ? N->x : 0) * x + car;
         car = val / 10;
         val = val % 10;
         head_insert(&X, val);
-        N = N ? N->prev : NULL;
+        N = N != NULL && N != head ? N->prev: NULL;
     }
     return X;
 }
@@ -156,7 +156,6 @@ static void add_zeros(bigint *N, unsigned int n, bigint *tail) {
         for (i = 0; i < n; i++)
             tail_insert(&N, 0, tail);
     }
-
 }
 
 static int tail_insert(bigint **N, digit x, bigint *tail) {
@@ -168,25 +167,26 @@ static int tail_insert(bigint **N, digit x, bigint *tail) {
     else {
         bigint *tmp = tail;
         tmp->next = bigint_alloc(x);
-        if (tmp->next != tail)
+        if (tmp->next)
             tmp->next->prev = tmp;
         return tmp->next != NULL;
     }
 }
 
-static bigint *sum_pos(bigint *N1, bigint *N2, bigint *tail1, bigint *tail2) {
+static bigint *sum_pos(bigint *N1, bigint *N2) {
     bigint *N = NULL;
     if (SGN(N1) > 0 && SGN(N2) > 0) {
         int val = 0, car = 0;;
-        N1 = last(N1, tail1);
-        N2 = last(N2, tail2);
+        bigint *head1 = N1,  *head2 = N2;
+        N1 = N1->prev;
+        N2 = N2->prev;
         while (N1 || N2 || car) {
             val = (N1 ? N1->x : 0) + (N2 ? N2->x : 0) + car;
             car = val / 10;
             val = val % 10;
             head_insert(&N, val);
-            N1 = N1 ? N1->prev : NULL;
-            N2 = N2 ? N2->prev : NULL;
+            N1 = N1 != NULL && N1 != head1 ? N1->prev: NULL;
+            N1 = N1 != NULL && N1 != head2 ? N1->prev: NULL;
         }
     }
     return N;

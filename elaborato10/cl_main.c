@@ -161,7 +161,7 @@ static void sprint(char* s, bigint* N) {
 
 
 
-int interactive_main() {
+/*int interactive_main() {
 	bigint* N1, * N2, * N;
 	char V1[255];
 	char V2[255];
@@ -233,11 +233,11 @@ int main(int argc, char* argv[]) {
 
 	fprintf(fp, "%s\tDL err=%d\t", argv[1], errori);
 	fclose(fp);
-#edif	
+#endif
 
 	return 0;
 }
 
 
-
-#endifn
+*/
+#endif

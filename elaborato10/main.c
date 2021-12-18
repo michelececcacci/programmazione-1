@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "dl_bigint.h"
-#include "dl_main.c"
+#include "cl_main.c"
+#include "cl_bigint.h"
 
 int main() {
     bigint *n1 = str2bigint("12");
