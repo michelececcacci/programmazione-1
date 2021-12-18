@@ -117,7 +117,7 @@ void snake_decrease(struct snake *s, unsigned int decrease_len) {
 void snake_save(struct snake *s, char *filename) {
     FILE *fp;
     fp = fopen(filename, "w");
-    if (!fp) return;
+    if (!fp || !s) return;
     struct body *current = s->body;
     fprintf(fp, "%u %u %u\n", s->length, s->rows, s->cols);
     while (current->next != NULL) {

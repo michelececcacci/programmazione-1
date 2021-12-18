@@ -97,14 +97,15 @@ static void remove_leading_zeros(bigint** N) {
 
 bigint *mul(bigint *N1, bigint *N2) {
     int sgn1 = SGN(N1), sgn2 = SGN(N2), n = 0;
-    bigint *tail2 = last(N2, N2), *tail1 = last(N1, N1), *n1_head = N1;
+    bigint  *n1_head = N1, *n2_head = N2, *tail2 = last(N2, n2_head), *tail1 = last(N1, N1);
     if (!sgn1 || !sgn2) return NULL;
     bigint *tmp = last(N2, tail2), *N = bigint_alloc(0);
-    while (tmp != tail2) {
+    while (tmp != n2_head) {
         bigint *a, *b;
-        a = mul_digit(N1, tmp->x, n1_head,tail1);
+        a = mul_digit(N1, tmp->x, n1_head, tail1);
         add_zeros(a, n++, tail1);
         b = sum_pos(N, a, tail1, tail2);
+        // maybe check delete ?
         delete(&N);
         delete(&a);
         N = b;
@@ -115,7 +116,7 @@ bigint *mul(bigint *N1, bigint *N2) {
 }
 
 static bigint* last(bigint *L, bigint *head_node) {
-    while (L->next != head_node){
+    while (L->next != head_node && L->next){
         L = L->next;
     }
     return L;
@@ -135,12 +136,11 @@ static bigint *mul_digit(bigint *N, digit x, bigint *head,bigint *tail) {
     } 
 }
 
-// todo seems like there is an error here, causing the loop to not work correctly
-static bigint *mul_digit_pos(bigint *N, digit x, bigint *head,bigint *tail) {
-    bigint *X= NULL;
+static bigint *mul_digit_pos(bigint *N, digit x, bigint *head, bigint *tail) {
+    bigint *X = NULL;
     int val = 0, car = 0; 
     N = last(N, head);
-    while (N != head|| car != 0){
+    while ((N != head && N != NULL) || car != 0){
         val = (N ? N->x : 0) * x + car;
         car = val / 10;
         val = val % 10;
@@ -193,8 +193,8 @@ static bigint *sum_pos(bigint *N1, bigint *N2, bigint *tail1, bigint *tail2) {
 }
 
 static void delete(bigint **N){
-if (N) {
-        while (*N) {
+if (*N && N) {
+        while ((*N)->next) {
             head_delete(N);
         }
     }
