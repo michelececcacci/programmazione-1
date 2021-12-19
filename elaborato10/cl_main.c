@@ -180,7 +180,8 @@ static void sprint(char* s, bigint* N) {
 	return 0;
 }
 
-
+*/
+#define TEST
 #define NTEST 10
 int test_main() {
 	char V1[NTEST][255] = { "1113" , "999987" , "67839000", "0", "100000000000000000" ,"-1","-3479672927592","-999989999999999999999","-5555","d"};
@@ -222,7 +223,7 @@ int main(int argc, char* argv[]) {
 	errori = test_main();
 	printf("\nErrori: %d\n", errori);
 #else
-	interactive_main();
+
 	
 #endif
 
@@ -239,5 +240,5 @@ int main(int argc, char* argv[]) {
 }
 
 
-*/
+
 #endif
